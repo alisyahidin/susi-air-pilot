@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { AuthenticationRegistry, JwtBearerProvider, type JwtClaims } from '@nestjs/authentication';
 import { UsersRepository } from '../users/users.repository.js';
-import { userSchema, type User } from '../users/schema/user.schema.js';
+import { userSchema, type User } from '../users/entities/user.entity.js';
 
 declare module '@nestjs/authentication' {
   interface AuthenticationTypes {

@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { AuthenticationModule } from '@nestjs/authentication';
+import { validationProviders } from './common/validation/index.js';
 import { appConfig, authConfig, envSchema, type AuthConfig } from './config/index.js';
 import { MockDbModule } from './db/mock/index.js';
 import { AuthModule } from './modules/auth/auth.module.js';
@@ -27,6 +28,7 @@ import { UsersModule } from './modules/users/users.module.js';
     UsersModule,
     AuthModule,
   ],
-  providers: [],
+  // Built-in zod validation: @Body({ schema }) for input, @SerializeOptions({ schema }) for output
+  providers: [...validationProviders],
 })
 export class AppModule {}

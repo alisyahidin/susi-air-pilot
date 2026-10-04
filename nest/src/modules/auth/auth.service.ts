@@ -1,9 +1,9 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { TokenService } from '@nestjs/authentication';
 import { UsersRepository } from '../users/users.repository.js';
-import { userSchema } from '../users/schema/user.schema.js';
+import { userSchema } from '../users/entities/user.entity.js';
 import type { LoginDto } from './dto/login.dto.js';
-import type { LoginResponse } from './schema/login-response.schema.js';
+import type { LoginResponseDto } from './dto/login-response.dto.js';
 
 @Injectable()
 export class AuthService {
@@ -12,7 +12,7 @@ export class AuthService {
     private readonly tokens: TokenService,
   ) {}
 
-  async login({ username, password }: LoginDto): Promise<LoginResponse> {
+  async login({ username, password }: LoginDto): Promise<LoginResponseDto> {
     const user = await this.users.findByUsername(username);
 
     if (!user || !passwordMatches(password, user.password)) {

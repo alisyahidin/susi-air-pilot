@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { userSchema } from '../../users/schema/user.schema.js';
+import { userSchema } from '../../users/entities/user.entity.js';
 
 export const loginResponseSchema = z.object({
   accessToken: z.string(),
@@ -8,4 +8,4 @@ export const loginResponseSchema = z.object({
   user: userSchema,
 });
 
-export type LoginResponse = z.infer<typeof loginResponseSchema>;
+export type LoginResponseDto = z.infer<typeof loginResponseSchema>;

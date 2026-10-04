@@ -1,9 +1,8 @@
-import { Body, Controller, HttpCode, HttpStatus, Post } from '@nestjs/common';
+import { Body, Controller, HttpCode, HttpStatus, Post, SerializeOptions } from '@nestjs/common';
 import { Public } from '@nestjs/authentication';
-import { ZodValidationPipe } from '../../common/pipes/zod-validation.pipe.js';
 import { AuthService } from './auth.service.js';
 import { loginSchema, type LoginDto } from './dto/login.dto.js';
-import type { LoginResponse } from './schema/login-response.schema.js';
+import { loginResponseSchema, type LoginResponseDto } from './dto/login-response.dto.js';
 
 @Controller('auth')
 export class AuthController {
@@ -12,7 +11,8 @@ export class AuthController {
   @Public()
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  login(@Body(new ZodValidationPipe(loginSchema)) body: LoginDto): Promise<LoginResponse> {
+  @SerializeOptions({ schema: loginResponseSchema })
+  login(@Body({ schema: loginSchema }) body: LoginDto): Promise<LoginResponseDto> {
     return this.auth.login(body);
   }
 }

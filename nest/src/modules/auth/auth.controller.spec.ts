@@ -3,7 +3,7 @@ import { CurrentUser } from '@nestjs/authentication';
 import { FastifyAdapter, type NestFastifyApplication } from '@nestjs/platform-fastify';
 import { Test } from '@nestjs/testing';
 import { AppModule } from '../../app.module.js';
-import type { User } from '../users/schema/user.schema.js';
+import type { User } from '../users/entities/user.entity.js';
 
 // Test-only route without @Public(), to check the issued access token passes the global guard
 @Controller('test-protected')
