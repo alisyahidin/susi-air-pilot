@@ -43,7 +43,7 @@ const DOCUMENT_BADGE = {
       <div class="grid grid-cols-2 gap-2">
         <ui-card class="flex flex-col min-w-0 items-start gap-2">
           <div>
-            <p class="text-lg font-bold">Daily</p>
+            <p class="text-[16px] font-bold">Daily</p>
             <p class="text-text-secondary font-medium">Today</p>
           </div>
           <ui-badge color="success" variant="icon" icon="lucide:check">Within Limit</ui-badge>
@@ -58,7 +58,7 @@ const DOCUMENT_BADGE = {
         </ui-card>
         <ui-card class="flex flex-col min-w-0 items-start gap-2">
           <div>
-            <p class="text-lg font-bold">Weekly</p>
+            <p class="text-[16px] font-bold">Weekly</p>
             <p class="text-text-secondary font-medium">Rolling 7 days</p>
           </div>
           <ui-badge color="danger" variant="icon">Over limit</ui-badge>
@@ -73,7 +73,7 @@ const DOCUMENT_BADGE = {
         </ui-card>
         <ui-card class="flex flex-col min-w-0 items-start gap-2">
           <div>
-            <p class="text-lg font-bold">Monthly</p>
+            <p class="text-[16px] font-bold">Monthly</p>
             <p class="text-text-secondary font-medium">Rolling 30 days</p>
           </div>
           <ui-badge color="warning" variant="icon">Approaching limit</ui-badge>
@@ -88,7 +88,7 @@ const DOCUMENT_BADGE = {
         </ui-card>
         <ui-card class="flex flex-col min-w-0 items-start gap-2">
           <div>
-            <p class="text-lg font-bold">Annual</p>
+            <p class="text-[16px] font-bold">Annual</p>
             <p class="text-text-secondary font-medium">Rolling 365 days</p>
           </div>
           <ui-badge color="success" variant="icon" icon="lucide:check">Within Limit</ui-badge>
