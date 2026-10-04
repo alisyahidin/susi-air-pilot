@@ -67,8 +67,8 @@ defineExpose({ focus: () => inputRef.value?.focus() })
           :disabled="disabled"
           @click="showPassword = !showPassword"
         >
-          <Icon v-if="!showPassword" name="lucide:eye" class="text-xl!" />
-          <Icon v-else name="lucide:eye-off" class="text-xl!" />
+          <Icon v-if="!showPassword" name="lucide:eye" size="20" />
+          <Icon v-else name="lucide:eye-off" size="20" />
         </button>
       </span>
     </div>

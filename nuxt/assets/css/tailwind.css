@@ -14,7 +14,7 @@
   }
 
   #__nuxt {
-    @apply flex flex-col min-h-screen min-w-0 w-full max-w-full md:max-w-lg mx-auto bg-background;
+    @apply relative flex flex-col min-h-screen min-w-0 w-full max-w-full md:max-w-lg mx-auto bg-background;
   }
 }
 
@@ -26,9 +26,9 @@
   --text-xs: 11px;
   --text-sm: 12px;
   --text-base: 14px;
-  --text-lg: 16px;
-  --text-xl: 20px;
-  --text-2xl: 28px;
+  --text-lg: 18px;
+  --text-xl: 24px;
+  --text-2xl: 32px;
 
   /* Disable all color variants */
   --color-orange-*: initial;
@@ -103,7 +103,22 @@
   --color-warning: oklch(0.769 0.165 70.07); /* #F59E0B */
   --color-danger: oklch(0.614 0.209 16.22); /* #E63757 */
   --color-info: oklch(0.761 0.131 217.47); /* #22C5E8 */
+
+  /* Status tints and inks, for text on tinted badges */
+  --color-success-tint: #E7F8F3;
+  --color-success-ink: #0B7355;
+  --color-warning-tint: #FEF4E0;
+  --color-warning-ink: #92590A;
+  --color-danger-tint: #FDEBEF;
+  --color-danger-ink: #C01F42;
+  --color-primary-tint: #EBEFF6;
+  --color-primary-ink: var(--color-primary);
+  --color-accent-tint: var(--color-danger-tint); /* accent and danger share #E63757 */
+  --color-accent-ink: var(--color-danger-ink);
+  --color-info-tint: #E5F7FC;
+  --color-info-ink: #0A6B82;
   --color-border: var(--color-neutral-100);
+  --color-track: #EEF0F3;
 
   /* Background & surfacecolors */
   --color-background: oklch(0.973 0.003 264.7); /* #F5F6F8 */

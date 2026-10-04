@@ -28,7 +28,7 @@ button {
   }
 
   &[data-color=white] {
-    @apply text-text-primary bg-white not-disabled:hover:bg-[#fafbfc] not-disabled:active:bg-[#f5f5f5] border disabled:opacity-50 shadow-black/15;
+    @apply text-text-primary bg-white not-disabled:hover:bg-[#fafbfc] not-disabled:active:bg-[#f5f5f5] border border-border disabled:opacity-50 shadow-black/15;
   }
 }
 </style>
