@@ -1,0 +1,118 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Plus Jakarta Sans';
+  src: url('../fonts/PlusJakartaSans-VariableFont_wght.ttf') format('truetype');
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+}
+
+@layer base {
+  body {
+    @apply text-base;
+  }
+
+  #__nuxt {
+    @apply flex flex-col min-h-screen min-w-0 w-full max-w-full md:max-w-lg mx-auto bg-background;
+  }
+}
+
+@theme {
+  /* Disable all font size */
+  --text-*: initial;
+
+  /* Font size */
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-base: 14px;
+  --text-lg: 16px;
+  --text-xl: 20px;
+  --text-2xl: 28px;
+
+  /* Disable all color variants */
+  --color-orange-*: initial;
+  --color-amber-*: initial;
+  --color-yellow-*: initial;
+  --color-lime-*: initial;
+  --color-green-*: initial;
+  --color-emerald-*: initial;
+  --color-teal-*: initial;
+  --color-cyan-*: initial;
+  --color-sky-*: initial;
+  --color-blue-*: initial;
+  --color-indigo-*: initial;
+  --color-violet-*: initial;
+  --color-purple-*: initial;
+  --color-fuchsia-*: initial;
+  --color-pink-*: initial;
+  --color-rose-*: initial;
+  --color-slate-*: initial;
+  --color-gray-*: initial;
+  --color-zinc-*: initial;
+  --color-neutral-*: initial;
+  --color-stone-*: initial;
+  --color-mauve-*: initial;
+  --color-olive-*: initial;
+  --color-mist-*: initial;
+  --color-taupe-*: initial;
+
+  /* Red colors */
+  --color-red-50: oklch(0.958 0.016 12.9);
+  --color-red-100: oklch(0.918 0.035 11.21);
+  --color-red-200: oklch(0.845 0.07 13.11);
+  --color-red-300: oklch(0.764 0.115 13.36);
+  --color-red-400: oklch(0.692 0.163 14.47);
+  --color-red-500: oklch(0.614 0.209 16.22); /* #E63757 */
+  --color-red-600: oklch(0.523 0.179 16.02);
+  --color-red-700: oklch(0.422 0.144 15.78);
+  --color-red-800: oklch(0.334 0.114 16.28);
+  --color-red-900: oklch(0.234 0.08 16.49);
+  --color-red-950: oklch(0.183 0.063 14.72);
+
+  /* Navy */
+  --color-navy-50: oklch(0.948 0.019 266.01);
+  --color-navy-100: oklch(0.889 0.04 263.66);
+  --color-navy-200: oklch(0.785 0.083 260.99);
+  --color-navy-300: oklch(0.672 0.133 255);
+  --color-navy-400: oklch(0.569 0.118 254.19);
+  --color-navy-500: oklch(0.458 0.095 254.03);
+  --color-navy-600: oklch(0.353 0.074 254.74);
+  --color-navy-700: oklch(0.245 0.051 254.36); /* #0E2138 */
+  --color-navy-800: oklch(0.207 0.043 255.19);
+  --color-navy-900: oklch(0.165 0.033 251.06);
+  --color-navy-950: oklch(0.132 0.027 251.63);
+
+  /* Neutral */
+  --color-neutral-50: oklch(0.965 0.003 286.81);
+  --color-neutral-100: oklch(0.922 0.006 264.6);
+  --color-neutral-200: oklch(0.854 0.012 264.53);
+  --color-neutral-300: oklch(0.775 0.018 264.48);
+  --color-neutral-400: oklch(0.698 0.025 264.41);
+  --color-neutral-500: oklch(0.629 0.027 265.49);
+  --color-neutral-600: oklch(0.551 0.023 264.37); /* #6B7280 */
+  --color-neutral-700: oklch(0.449 0.019 266.11);
+  --color-neutral-800: oklch(0.344 0.015 264.36);
+  --color-neutral-900: oklch(0.243 0.011 260.69);
+  --color-neutral-950: oklch(0.187 0.008 274.47);
+
+  /* Semantic colors */
+  --color-primary: var(--color-navy-700);
+  --color-accent: var(--color-red-500);
+  --color-success: oklch(0.716 0.143 166.16); /* #1FBF8F */
+  --color-warning: oklch(0.769 0.165 70.07); /* #F59E0B */
+  --color-danger: oklch(0.614 0.209 16.22); /* #E63757 */
+  --color-info: oklch(0.761 0.131 217.47); /* #22C5E8 */
+  --color-border: var(--color-neutral-100);
+
+  /* Background & surfacecolors */
+  --color-background: oklch(0.973 0.003 264.7); /* #F5F6F8 */
+  --color-surface: #FFFFFF;
+
+  /* Text colors */
+  --color-text-primary: var(--color-navy-700);
+  --color-text-secondary: var(--color-neutral-600);
+
+  /* Fonts */
+  --font-sans: "Plus Jakarta Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+}

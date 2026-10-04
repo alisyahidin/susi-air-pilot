@@ -1,0 +1,25 @@
+{
+  "name": "nuxt",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@nuxt/icon": "^1.15.0",
+    "nuxt": "^3.15.1",
+    "pinia": "^4.0.3",
+    "vue": "^3.5.40",
+    "vue-router": "^5.2.0"
+  },
+  "devDependencies": {
+    "@iconify-json/lucide": "^1.2.139",
+    "@tailwindcss/postcss": "^4.3.3",
+    "sass": "^1.105.1",
+    "tailwindcss": "^4.3.3"
+  }
+}
