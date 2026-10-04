@@ -70,8 +70,8 @@ async function retry() {
 </script>
 
 <template>
-  <!-- Maintenance blocks everything, so there is no navigation; the topbar hides the avatar when signed out -->
-  <layout-topbar />
+  <!-- Maintenance blocks everything, so it never shows the avatar or navigation -->
+  <layout-topbar :hide-avatar="isMaintenance" />
 
   <main class="flex-1 flex flex-col items-center justify-center gap-6 px-4 py-5">
     <ui-card class="w-full flex flex-col items-center gap-4 px-6! py-10! text-center">

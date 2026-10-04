@@ -1,4 +1,8 @@
 <script setup lang="ts">
+const props = defineProps<{
+  hideAvatar?: boolean
+}>()
+
 const { isAuthenticated } = useAuth()
 </script>
 
@@ -12,7 +16,7 @@ const { isAuthenticated } = useAuth()
         <Icon name="lucide:calendar" />
         <span class="text-[13px] font-semibold">Fri, 15 May</span>
       </div>
-      <ui-avatar v-if="isAuthenticated">
+      <ui-avatar v-if="isAuthenticated && !props.hideAvatar">
         <ui-avatar-image src="https://i.pravatar.cc/150?u=johndo@pravatar.com" />
         <ui-avatar-fallback>JD</ui-avatar-fallback>
       </ui-avatar>
