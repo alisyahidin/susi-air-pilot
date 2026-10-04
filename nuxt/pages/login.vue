@@ -10,8 +10,6 @@ const password = ref('')
 <template>
   <header class="bg-primary flex items-center gap-2 p-4 h-16">
     <img src="/logo-white.png" class="h-8" fetchpriority="high" />
-    <span class="text-base text-neutral-300">|</span>
-    <span class="text-base text-neutral-300">Pilot App</span>
   </header>
   <main class="flex flex-col items-center justify-center flex-1 gap-8 p-4">
     <ui-card>
