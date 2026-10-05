@@ -14,7 +14,7 @@
   }
 
   #__nuxt {
-    @apply relative flex flex-col min-h-screen min-w-0 w-full max-w-full md:max-w-lg mx-auto bg-background;
+    @apply relative flex flex-col min-h-screen min-w-0 w-full max-w-full md:max-w-lg md:border-x md:border-border mx-auto bg-background;
   }
 }
 

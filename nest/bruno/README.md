@@ -33,15 +33,16 @@ Requests build their URL from the `baseUrl` variable, e.g. `{{baseUrl}}/auth/log
 | Request | Method and URL | Auth |
 | --- | --- | --- |
 | Auth Login | `POST {{baseUrl}}/auth/login` | Public |
+| Auth Refresh | `POST {{baseUrl}}/auth/refresh` | Refresh token cookie |
+| Auth Logout | `POST {{baseUrl}}/auth/logout` | Refresh token cookie |
 
 ### Auth Login
 
-Signs in with a username and password. A successful response returns the tokens and the user:
+Signs in with a username and password. A successful response returns the access token and the user, and sets the refresh token as an `httpOnly` cookie (`susi_refresh_token`, sent only to `/api/v1/auth`). Bruno keeps that cookie for you:
 
 ```json
 {
   "accessToken": "eyJhbGciOiJIUzI1NiIs…",
-  "refreshToken": "zNFuiv74VAk7…",
   "expiresIn": 900,
   "user": {
     "id": "c9542e84-fe0d-4d20-9552-638b7771f8b8",
@@ -75,7 +76,9 @@ Every route except login needs the access token from Auth Login:
 Authorization: Bearer <accessToken>
 ```
 
-Access tokens expire after `expiresIn` seconds (15 minutes by default, `JWT_ACCESS_TTL` in `.env`), so sign in again when requests start returning `401`.
+Access tokens expire after `expiresIn` seconds (15 minutes by default, `JWT_ACCESS_TTL` in `.env`). Get a new one with `POST /auth/refresh`, which uses the refresh token cookie and rotates it: each refresh token works once, and sending a used one again signs that session out everywhere. `POST /auth/logout` revokes it.
+
+Refresh tokens are kept in memory, so restarting the API (including `start:dev` reloading after a code change) signs everyone out.
 
 ## Adding requests
 

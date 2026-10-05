@@ -1,8 +1,9 @@
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
-import { VersioningType } from '@nestjs/common';
 import { AppModule } from './app.module.js';
 import { appConfig, type AppConfig } from './config/index.js';
+import fastifyCookie from '@fastify/cookie';
+import { VersioningType } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -10,12 +11,20 @@ async function bootstrap() {
     new FastifyAdapter()
   );
 
-  app.setGlobalPrefix('api');
+  const { corsOrigins } = app.get<AppConfig>(appConfig.KEY);
 
-  app.enableVersioning({
-    type: VersioningType.URI,
-    defaultVersion: '1'
-  })
+  await app.register(fastifyCookie);
+
+  app.setGlobalPrefix('api');
+  app.enableVersioning({ type: VersioningType.URI, defaultVersion: '1' });
+
+  app.enableCors({
+    origin: corsOrigins,
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    maxAge: 600,
+  });
 
   const { port } = app.get<AppConfig>(appConfig.KEY);
   await app.listen(port, '0.0.0.0');

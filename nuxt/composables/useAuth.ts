@@ -1,7 +1,11 @@
-// Single source of auth status for middleware, layouts and the error page.
-// Dummy until sign-in is wired to the API: flip the default to test the signed-out state.
 export function useAuth() {
-  const isAuthenticated = useState<boolean>('auth:authenticated', () => true)
+  const store = useAuthStore()
+  const { user, isAuthenticated } = storeToRefs(store)
 
-  return { isAuthenticated }
+  async function logout() {
+    await store.logout()
+    await navigateTo('/login', { replace: true })
+  }
+
+  return { user, isAuthenticated, login: store.login, logout }
 }

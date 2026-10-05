@@ -1,7 +1,7 @@
-name: Local
+name: local
 variables:
   - name: baseUrl
     value: http://localhost:3001/api/v1
-    enabled: true
-    secret: false
     description: The Nest API started with `npm run start:dev` (PORT in nest/.env)
+  - secret: true
+    name: accessToken

@@ -1,11 +1,10 @@
 import { z } from 'zod';
 import { userSchema } from '../../users/entities/user.entity.js';
 
-export const loginResponseSchema = z.object({
+export const sessionResponseSchema = z.object({
   accessToken: z.string(),
-  refreshToken: z.string(),
-  expiresIn: z.number(),
+  expiresIn: z.number(), /** Seconds until the access token expires */
   user: userSchema,
 });
 
-export type LoginResponseDto = z.infer<typeof loginResponseSchema>;
+export type SessionResponseDto = z.infer<typeof sessionResponseSchema>;

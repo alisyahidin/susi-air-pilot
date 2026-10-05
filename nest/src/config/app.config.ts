@@ -6,6 +6,7 @@ export const appConfig = registerAs('app', () => {
   return {
     nodeEnv: env.NODE_ENV,
     port: env.PORT,
+    corsOrigins: env.CORS_ORIGIN,
   };
 });
 
