@@ -1,0 +1,18 @@
+info:
+  name: Pilot Me
+  type: http
+  seq: 1
+
+http:
+  method: GET
+  url: "{{baseUrl}}/pilot/me"
+  headers:
+    - name: Authorization
+      value: Bearer {{accessToken}}
+  auth: inherit
+
+settings:
+  encodeUrl: true
+  timeout: 0
+  followRedirects: true
+  maxRedirects: 5

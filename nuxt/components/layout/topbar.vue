@@ -1,9 +1,23 @@
 <script setup lang="ts">
+import {
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuRoot,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from 'reka-ui'
+
 const props = defineProps<{
   hideAvatar?: boolean
 }>()
 
-const { isAuthenticated } = useAuth()
+const { isAuthenticated, user, logout } = useAuth()
+
+const initials = computed(() =>
+  (user.value?.name ?? '').split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]!.toUpperCase()).join('')
+)
 </script>
 
 <template>
@@ -16,10 +30,38 @@ const { isAuthenticated } = useAuth()
         <Icon name="lucide:calendar" />
         <span class="text-[13px] font-semibold">Fri, 15 May</span>
       </div>
-      <ui-avatar v-if="isAuthenticated && !props.hideAvatar">
-        <ui-avatar-image src="https://i.pravatar.cc/150?u=johndo@pravatar.com" />
-        <ui-avatar-fallback>JD</ui-avatar-fallback>
-      </ui-avatar>
+
+      <DropdownMenuRoot v-if="isAuthenticated && user && !props.hideAvatar">
+        <DropdownMenuTrigger
+          aria-label="Open profile menu"
+          class="flex items-center justify-center size-11 -mr-1.5 rounded-full cursor-pointer outline-none transition-colors hover:bg-background data-[state=open]:bg-background focus-visible:outline-2 focus-visible:outline-primary"
+        >
+          <ui-avatar>
+            <ui-avatar-image :src="user.image_url" :alt="user.name" />
+            <ui-avatar-fallback>{{ initials }}</ui-avatar-fallback>
+          </ui-avatar>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuPortal>
+          <DropdownMenuContent
+            align="end"
+            :side-offset="6"
+            class="z-50 min-w-56 p-1.5 rounded-xl border border-border bg-white shadow-lg"
+          >
+            <DropdownMenuLabel class="flex flex-col gap-0.5 px-3 py-2">
+              <span class="font-bold text-text-primary">{{ user.name }}</span>
+              <span class="text-sm font-medium text-text-secondary">@{{ user.username }}</span>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator class="h-px my-1 bg-border" />
+            <DropdownMenuItem
+              class="flex items-center gap-2 h-10 px-3 rounded-lg font-semibold text-danger-ink cursor-pointer outline-none data-highlighted:bg-danger-tint"
+              @select="logout"
+            >
+              Sign out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenuPortal>
+      </DropdownMenuRoot>
     </div>
   </header>
 </template>

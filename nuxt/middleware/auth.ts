@@ -1,6 +1,6 @@
 const AUTH_ROUTES = ['/login']
 
-export default defineNuxtRouteMiddleware((to, from) => {
+export default defineNuxtRouteMiddleware((to) => {
   const { isAuthenticated } = useAuth()
 
   if (!isAuthenticated.value && !AUTH_ROUTES.includes(to.path)) {

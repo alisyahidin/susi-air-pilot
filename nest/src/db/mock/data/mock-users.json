@@ -1,0 +1,16 @@
+[
+  {
+    "id": "67b0ec9a-1786-46b9-9ee1-531297fb9e41",
+    "name": "John Doe",
+    "username": "johndoe",
+    "password": "susiairtest",
+    "image_url": "https://i.pravatar.cc/120?u=johndoe"
+  },
+  {
+    "id": "c9542e84-fe0d-4d20-9552-638b7771f8b8",
+    "name": "Udin Sedunia",
+    "username": "udin",
+    "password": "susiairtest",
+    "image_url": "https://i.pravatar.cc/120?u=udin"
+  }
+]

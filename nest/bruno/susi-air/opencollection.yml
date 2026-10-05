@@ -1,0 +1,11 @@
+opencollection: 1.0.0
+
+info:
+  name: susi-air
+bundled: false
+extensions:
+  bruno:
+    defaultEnvironment: Local
+    ignore:
+      - node_modules
+      - .git

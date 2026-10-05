@@ -4,6 +4,9 @@ definePageMeta({
   layout: 'dashboard'
 })
 
+const { user } = useAuth()
+const { data: pilot, status: pilotStatus } = usePilotMe()
+
 type DocumentStatus = 'valid' | 'expiring' | 'expired'
 
 const documents: { name: string, expiry: string, status: DocumentStatus, remaining: string }[] = [
@@ -25,7 +28,7 @@ const DOCUMENT_BADGE = {
   <div class="space-y-4">
     <div>
       <p class="text-sm font-medium text-text-secondary">Welcome back,</p>
-      <h1 class="text-lg font-bold">John Doe</h1>
+      <h1 class="text-lg font-bold">{{ user?.name }}</h1>
     </div>
     <ui-card class="flex items-center gap-4 bg-primary!">
       <div class="flex items-center justify-center rounded-full p-3 bg-navy-600">
@@ -33,7 +36,11 @@ const DOCUMENT_BADGE = {
       </div>
       <div>
         <p class="text-neutral-200">Total flight hours</p>
-        <p class="text-xl font-bold text-white">4,285 <span class="text-neutral-200 text-base">h</span></p>
+        <p v-if="pilot" class="text-xl font-bold text-white tabular-nums">
+          {{ pilot.formattedTotalFlightHours }} <span class="text-neutral-200 text-base">h</span>
+        </p>
+        <p v-else-if="pilotStatus === 'error'" class="text-sm font-semibold text-neutral-200">Couldn't load your flight hours</p>
+        <span v-else class="block h-7 w-24 mt-0.5 rounded-md bg-navy-600 animate-pulse" aria-label="Loading flight hours" />
       </div>
     </ui-card>
 
