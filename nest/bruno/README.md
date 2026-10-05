@@ -35,6 +35,8 @@ Requests build their URL from the `baseUrl` variable, e.g. `{{baseUrl}}/auth/log
 | Auth Login | `POST {{baseUrl}}/auth/login` | Public |
 | Auth Refresh | `POST {{baseUrl}}/auth/refresh` | Refresh token cookie |
 | Auth Logout | `POST {{baseUrl}}/auth/logout` | Refresh token cookie |
+| Pilot Me | `GET {{baseUrl}}/pilot/me` | `Bearer {{accessToken}}` |
+| Flight Hours Limits | `GET {{baseUrl}}/flight-hours/limits?date=2026-05-15` | `Bearer {{accessToken}}` |
 
 ### Auth Login
 
@@ -59,6 +61,12 @@ Signs in with a username and password. A successful response returns the access 
 | `400` | `username` or `password` missing or blank; the body lists the field errors |
 | `401` | Wrong password or unknown user (the same message for both) |
 
+### Flight Hours Limits
+
+The signed-in pilot's hours in each rolling window ending on `date`, against its limit: daily (that day), weekly (7 days), monthly (30) and annual (365). `status` is `within`, `approaching` (80% of the limit or more), `at_limit` or `over`; `remaining` goes negative when over.
+
+`date` is set to `2026-05-15`, the same simulated today the frontend reads from `TODAY` in `nuxt/.env`, because the mock log ends on 2026-05-31. Disable the parameter to use the server's today (UTC). A malformed date returns `400`.
+
 ## Test accounts
 
 The API runs on mock data from `src/db/mock/data/mock-users.json`:
@@ -70,7 +78,7 @@ The API runs on mock data from `src/db/mock/data/mock-users.json`:
 
 ## Calling protected endpoints
 
-Every route except login needs the access token from Auth Login:
+Every route except login needs the access token from Auth Login. Copy it into the environment's secret `accessToken` variable; protected requests send it as:
 
 ```
 Authorization: Bearer <accessToken>

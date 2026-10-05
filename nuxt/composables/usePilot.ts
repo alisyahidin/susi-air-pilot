@@ -11,7 +11,7 @@ export function usePilotMe() {
     server: false,
     transform: pilot => ({
       ...pilot,
-      formattedTotalFlightHours: pilot.totalFlightHours.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+      formattedTotalFlightHours: pilot.totalFlightHours.toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
     })
   })
 }

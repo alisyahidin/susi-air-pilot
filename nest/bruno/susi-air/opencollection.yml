@@ -5,7 +5,7 @@ info:
 bundled: false
 extensions:
   bruno:
-    defaultEnvironment: Local
+    defaultEnvironment: local
     ignore:
       - node_modules
       - .git

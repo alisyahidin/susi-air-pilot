@@ -75,11 +75,11 @@ function selectRange(key: RangeKey) {
   active.value = TODAY_POS
 }
 
-const fmt = (v: number) => v.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
-const fmtInt = (v: number) => v.toLocaleString('en-US')
+const fmt = (v: number) => v.toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
+const fmtInt = (v: number) => v.toLocaleString('id-ID')
 const dateAt = (pos: number) => new Date(TODAY.getTime() + (pos - TODAY_POS) * 86_400_000)
 const weekday = (d: Date, style: 'narrow' | 'short') => d.toLocaleDateString('en-US', { weekday: style, timeZone: 'UTC' })
-const monthDay = (d: Date) => d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', timeZone: 'UTC' })
+const monthDay = (d: Date) => d.toLocaleDateString('en-US', { day: 'numeric', month: 'short', timeZone: 'UTC' })
 
 const config = computed(() => RANGES[range.value])
 const values = computed(() =>

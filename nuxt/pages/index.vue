@@ -6,6 +6,7 @@ definePageMeta({
 
 const { user } = useAuth()
 const { data: pilot, status: pilotStatus } = usePilotMe()
+const { data: hoursToLimit, status: hoursToLimitStatus } = useHoursToLimit()
 
 type DocumentStatus = 'valid' | 'expiring' | 'expired'
 
@@ -40,74 +41,37 @@ const DOCUMENT_BADGE = {
           {{ pilot.formattedTotalFlightHours }} <span class="text-neutral-200 text-base">h</span>
         </p>
         <p v-else-if="pilotStatus === 'error'" class="text-sm font-semibold text-neutral-200">Couldn't load your flight hours</p>
-        <span v-else class="block h-7 w-24 mt-0.5 rounded-md bg-navy-600 animate-pulse" aria-label="Loading flight hours" />
+        <span v-else class="block h-8 w-24 mt-1 rounded-md bg-navy-600 animate-pulse" aria-label="Loading flight hours" />
       </div>
     </ui-card>
 
     <!-- Hours to Limit -->
     <div class="space-y-2">
       <p class="font-bold text-lg">Hours to Limit</p>
-      <div class="grid grid-cols-2 gap-2">
-        <ui-card class="flex flex-col min-w-0 items-start gap-2">
-          <div>
-            <p class="text-[16px] font-bold">Daily</p>
-            <p class="text-text-secondary font-medium">Today</p>
-          </div>
-          <ui-badge color="success" variant="icon" icon="lucide:check">Within Limit</ui-badge>
-          <div>
-            <p class="text-xl font-extrabold">5.6 <span class="text-text-secondary text-base">h</span></p>
-            <p class="text-text-secondary font-medium">of 8 hour limit</p>
-          </div>
-          <div class="w-full space-y-2">
-            <ui-progress :value="6" :max="10" color="success" />
-            <p class="font-semibold">2.4 hour remaining</p>
-          </div>
-        </ui-card>
-        <ui-card class="flex flex-col min-w-0 items-start gap-2">
-          <div>
-            <p class="text-[16px] font-bold">Weekly</p>
-            <p class="text-text-secondary font-medium">Rolling 7 days</p>
-          </div>
-          <ui-badge color="danger" variant="icon">Over limit</ui-badge>
-          <div>
-            <p class="text-xl font-extrabold">42.0 <span class="text-text-secondary text-base">h</span></p>
-            <p class="text-text-secondary font-medium">of 40 hour limit</p>
-          </div>
-          <div class="w-full space-y-2">
-            <ui-progress :value="10" :max="10" color="danger" />
-            <p class="font-semibold">2.0 hour over limit</p>
-          </div>
-        </ui-card>
-        <ui-card class="flex flex-col min-w-0 items-start gap-2">
-          <div>
-            <p class="text-[16px] font-bold">Monthly</p>
-            <p class="text-text-secondary font-medium">Rolling 30 days</p>
-          </div>
-          <ui-badge color="warning" variant="icon">Approaching limit</ui-badge>
-          <div>
-            <p class="text-xl font-extrabold">84.1 <span class="text-text-secondary text-base">h</span></p>
-            <p class="text-text-secondary font-medium">of 100 hour limit</p>
-          </div>
-          <div class="w-full space-y-2">
-            <ui-progress :value="9" :max="10" color="warning" />
-            <p class="font-semibold">2.4 hour remaining</p>
-          </div>
-        </ui-card>
-        <ui-card class="flex flex-col min-w-0 items-start gap-2">
-          <div>
-            <p class="text-[16px] font-bold">Annual</p>
-            <p class="text-text-secondary font-medium">Rolling 365 days</p>
-          </div>
-          <ui-badge color="success" variant="icon" icon="lucide:check">Within Limit</ui-badge>
-          <div>
-            <p class="text-xl font-extrabold">737.5 <span class="text-text-secondary text-base">h</span></p>
-            <p class="text-text-secondary font-medium">of 1,050 hour limit</p>
-          </div>
-          <div class="w-full space-y-2">
-            <ui-progress :value="9" :max="10" color="success" />
-            <p class="font-semibold">2.4 hour remaining</p>
-          </div>
-        </ui-card>
+      <p v-if="hoursToLimitStatus === 'error'" class="text-text-secondary font-medium">Couldn't load your hours to limit.</p>
+      <div v-else class="grid grid-cols-2 gap-2">
+        <template v-if="hoursToLimit">
+          <ui-card v-for="limit in hoursToLimit.limits" :key="limit.period" class="flex flex-col min-w-0 items-start gap-2">
+            <div>
+              <p class="text-[16px] font-bold">{{ limit.title }}</p>
+              <p class="text-text-secondary font-medium">{{ limit.window }}</p>
+            </div>
+            <ui-badge :color="limit.badge.color" variant="icon" :icon="limit.badge.icon">{{ limit.badge.label }}</ui-badge>
+            <div>
+              <p class="text-xl font-extrabold tabular-nums">{{ limit.formattedHours }} <span class="text-text-secondary text-base">h</span></p>
+              <p class="text-text-secondary font-medium">of {{ limit.formattedLimit }} hour limit</p>
+            </div>
+            <div class="w-full space-y-2">
+              <ui-progress :value="limit.hours" :max="limit.limit" :color="limit.badge.color" :label="`${limit.title} hours`" />
+              <p class="font-semibold">{{ limit.remainingText }}</p>
+            </div>
+          </ui-card>
+        </template>
+        <template v-else>
+          <ui-card v-for="n in 4" :key="n" class="h-[221px]" aria-label="Loading hours to limit">
+            <div class="animate-pulse size-full rounded-xs bg-neutral-100" />
+          </ui-card>
+        </template>
       </div>
     </div>
 
