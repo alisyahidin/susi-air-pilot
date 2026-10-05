@@ -299,7 +299,7 @@ const todayStatus = computed(() => {
 <template>
   <ui-card class="flex flex-col gap-4">
     <div class="flex flex-col gap-3">
-      <div class="flex items-center gap-4">
+      <div class="flex items-center justify-between gap-4">
         <div>
           <p class="text-[24px] leading-8 font-extrabold tabular-nums">
             {{ fmt(todayValue) }} <span class="text-[15px] font-bold text-text-secondary">h</span>
