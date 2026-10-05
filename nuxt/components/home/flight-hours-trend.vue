@@ -40,11 +40,12 @@ const loading = computed(() => status.value === 'pending')
 const DAYS = computed(() => summary.value?.points.length ?? 15)
 const TODAY_POS = computed(() => Math.max(0, summary.value?.points.findIndex(p => p.date === summary.value!.date) ?? 7))
 
-const active = ref(7)
+// The day whose tooltip is shown; null until the pilot hovers, taps or focuses one
+const active = ref<number | null>(null)
 const chartRef = ref<{ chart?: ChartJS<'line'> }>()
 
-// New data (first load or another range): select today again
-watch(summary, () => { active.value = TODAY_POS.value })
+// New data (first load or another range): no tooltip until the pilot picks a day again
+watch(summary, () => { active.value = null })
 
 // The highlight and tooltip are drawn by the overlay plugin, so repaint when the active day changes
 watch(active, () => chartRef.value?.chart?.draw())
@@ -119,7 +120,7 @@ const overlayPlugin: Plugin<'line'> = {
     const meta = chart.getDatasetMeta(0)
     const colWidth = chartArea.width / DAYS.value
 
-    const activePoint = meta.data[active.value]
+    const activePoint = active.value === null ? undefined : meta.data[active.value]
     if (activePoint) {
       ctx.save()
       ctx.fillStyle = 'rgba(14, 33, 56, 0.05)'
@@ -140,8 +141,11 @@ const overlayPlugin: Plugin<'line'> = {
     }
   },
   afterDraw(chart) {
-    const point = chart.getDatasetMeta(0).data[active.value]
-    if (!point) return
+    const point = active.value === null ? undefined : chart.getDatasetMeta(0).data[active.value]
+    if (!point) {
+      tooltipPos.value = null
+      return
+    }
     const next = { x: Math.round(point.x), y: Math.round(point.y) }
     if (next.x !== tooltipPos.value?.x || next.y !== tooltipPos.value?.y) tooltipPos.value = next
   }
@@ -219,7 +223,8 @@ const chartOptions = computed<ChartOptions<'line'>>(() => {
               display: true,
               content: `Limit ${fmtInt(limitValue)} h`,
               position: 'end',
-              yAdjust: -12,
+              // Under the line, inside the plot
+              yAdjust: 12,
               backgroundColor: COLORS.dangerTint,
               color: COLORS.dangerInk,
               font: { family: FONT, size: 11, weight: 700 },
@@ -244,9 +249,9 @@ const chartOptions = computed<ChartOptions<'line'>>(() => {
 
 const tooltip = computed(() => {
   const i = active.value
-  const point = points.value[i]
+  const point = i === null ? undefined : points.value[i]
   const pos = tooltipPos.value
-  if (!point) return { visible: false, left: 0, top: 0, transform: '', date: '', value: '', note: '', isOver: false }
+  if (i === null || !point) return { visible: false, left: 0, top: 0, transform: '', date: '', value: '', note: '', isOver: false }
   const gap = Math.round(Math.abs(limit.value - point.value) * 10) / 10
   // Keep the tooltip inside the chart near the edges, and below the point when it sits near the top
   const shiftX = i <= 3 ? '-15%' : i >= DAYS.value - 4 ? '-85%' : '-50%'
@@ -302,7 +307,7 @@ const tooltip = computed(() => {
     <p v-if="status === 'error' && !summary" class="text-text-secondary font-medium">Couldn't load your flight hours trend.</p>
     <div v-else-if="!summary" class="h-[251px] rounded-xl bg-background animate-pulse" aria-label="Loading flight hours trend" />
     <div v-else class="flex flex-col gap-2.5 transition-opacity" :class="{ 'opacity-50': loading }" :aria-busy="loading">
-      <div class="relative h-[206px]">
+      <div class="relative h-[206px]" @mouseleave="active = null">
         <ClientOnly>
           <Line
             ref="chartRef"
@@ -327,7 +332,7 @@ const tooltip = computed(() => {
       </div>
 
       <!-- Date row; each day is also a keyboard target that shows its tooltip -->
-      <div class="grid grid-cols-15 ml-11">
+      <div class="grid grid-cols-15 ml-11" @focusout="(event: FocusEvent) => { if (!(event.currentTarget as HTMLElement).contains(event.relatedTarget as Node)) active = null }">
         <button
           v-for="(point, i) in points"
           :key="i"

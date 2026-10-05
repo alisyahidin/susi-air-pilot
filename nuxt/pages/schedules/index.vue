@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type DateValue, isSameDay, isSameMonth } from '@internationalized/date'
+import { type DateValue, isSameDay, isSameMonth, parseDate } from '@internationalized/date'
 import {
   CalendarCell,
   CalendarCellTrigger,
@@ -12,33 +12,35 @@ import {
   CalendarPrev,
   CalendarRoot
 } from 'reka-ui'
-import { DUTY_TYPES, SCHEDULE_MAX, SCHEDULE_MIN, SCHEDULE_TODAY, fetchSchedules } from '~/composables/useSchedules'
+import type { ScheduleDay } from '~/composables/useSchedules'
+import UiButton from '~/components/ui/button/index.vue'
+
+// The app's (simulated) today, from TODAY in .env
+const today = parseDate(useToday())
 
 // The month on screen; Reka moves it with the prev/next buttons and keyboard paging
-const placeholder = ref<DateValue>(SCHEDULE_TODAY)
+const placeholder = ref<DateValue>(today)
 
 // Lazy: navigation doesn't wait for the request, the page shows its loading state instead
-const { data: schedule, status } = useLazyAsyncData(
-  'schedules',
-  () => fetchSchedules(placeholder.value.year, placeholder.value.month),
-  { watch: [() => `${placeholder.value.year}-${placeholder.value.month}`] }
-)
+const { data: schedule, status } = useMonthSchedule(placeholder)
 const loading = computed(() => status.value === 'pending')
 
 // While the next month loads, don't paint the previous month's duties onto it
-const entries = computed(() =>
+const entries = computed<Record<number, ScheduleDay>>(() =>
   schedule.value?.year === placeholder.value.year && schedule.value?.month === placeholder.value.month
-    ? schedule.value.entries
+    ? Object.fromEntries(schedule.value.days.map(day => [Number(day.date.slice(8)), day]))
     : {}
 )
+
+const legend = computed(() => schedule.value?.legend ?? [])
 
 const monthLabel = computed(() =>
   placeholder.value.toDate('UTC').toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' })
 )
-const isCurrentMonth = computed(() => isSameMonth(placeholder.value, SCHEDULE_TODAY))
-const isFutureMonth = computed(() => placeholder.value.compare(SCHEDULE_TODAY) > 0 && !isCurrentMonth.value)
+const isCurrentMonth = computed(() => isSameMonth(placeholder.value, today))
+const isFutureMonth = computed(() => placeholder.value.compare(today) > 0 && !isCurrentMonth.value)
 
-const dutyTypes = Object.fromEntries(DUTY_TYPES.map(type => [type.code, type]))
+const dutyLabels = computed(() => Object.fromEntries(legend.value.map(type => [type.code, type.label])))
 
 // Readable label colour on any duty colour the API sends
 function inkOn(hex: string) {
@@ -52,10 +54,10 @@ function inkOn(hex: string) {
 
 function dayInfo(date: DateValue) {
   const entry = entries.value[date.day]
-  const remaining = entry ? Math.max(0, entry.count_schedules - entry.count_logbooks) : 0
-  const color = (entry && dutyTypes[entry.type]?.base_color) || '#9AA3B0'
-  const isToday = isSameDay(date, SCHEDULE_TODAY)
-  const isPast = date.compare(SCHEDULE_TODAY) <= 0
+  const remaining = entry ? Math.max(0, entry.countSchedules - entry.countLogbooks) : 0
+  const color = entry?.baseColor || '#9AA3B0'
+  const isToday = isSameDay(date, today)
+  const isPast = date.compare(today) <= 0
   const weekday = date.toDate('UTC').toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' })
   return {
     entry,
@@ -63,7 +65,7 @@ function dayInfo(date: DateValue) {
     isToday,
     isPast,
     pillStyle: { backgroundColor: color, color: inkOn(color) },
-    label: `${weekday}${isToday ? ', today' : ''}, ${entry ? `${entry.type}, ${remaining ? `${remaining} remaining` : 'logbook complete'}` : 'no duty'}`
+    label: `${weekday}${isToday ? ', today' : ''}, ${entry ? `${dutyLabels.value[entry.dutyType] ?? entry.dutyType} (${entry.baseName}), ${remaining ? `${remaining} remaining` : 'logbook complete'}` : 'no duty'}`
   }
 }
 
@@ -71,8 +73,8 @@ const dutyDays = computed(() => Object.keys(entries.value).length)
 const summary = computed(() => {
   if (isFutureMonth.value) return { color: 'primary', text: 'No entries due yet' } as const
   const due = Object.entries(entries.value)
-    .filter(([day]) => placeholder.value.set({ day: Number(day) }).compare(SCHEDULE_TODAY) <= 0)
-    .reduce((sum, [, e]) => sum + Math.max(0, e.count_schedules - e.count_logbooks), 0)
+    .filter(([day]) => placeholder.value.set({ day: Number(day) }).compare(today) <= 0)
+    .reduce((sum, [, e]) => sum + Math.max(0, e.countSchedules - e.countLogbooks), 0)
   if (due > 0) return { color: 'warning', text: `${due} logbook ${due === 1 ? 'entry' : 'entries'} remaining` } as const
   return { color: 'success', text: 'Logbook up to date' } as const
 })
@@ -86,8 +88,6 @@ function openDate(date: DateValue | DateValue[] | undefined) {
   <CalendarRoot
     v-slot="{ grid, weekDays }"
     v-model:placeholder="placeholder"
-    :min-value="SCHEDULE_MIN"
-    :max-value="SCHEDULE_MAX"
     :week-starts-on="1"
     weekday-format="short"
     locale="en-US"
@@ -95,19 +95,19 @@ function openDate(date: DateValue | DateValue[] | undefined) {
     class="flex flex-col gap-4"
     @update:model-value="openDate"
   >
-    <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-3">
-      <div class="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+    <div class="flex items-center justify-between gap-x-0 gap-y-3">
+      <div class="flex items-baseline gap-x-2 gap-y-1">
         <h1 class="text-lg leading-8 font-bold tracking-[-0.01em]">Schedule</h1>
-        <span aria-live="polite" class="font-bold text-text-secondary">{{ monthLabel }}</span>
+        <span aria-live="polite" class="font-bold text-text-secondary line-clamp-1">{{ monthLabel }}</span>
       </div>
-      <div class="flex items-center gap-2">
-        <button v-if="!isCurrentMonth" type="button" class="schedule-control px-4.5 text-[13px] font-bold" @click="placeholder = SCHEDULE_TODAY">
+      <div class="flex items-center gap-1">
+        <ui-button v-if="!isCurrentMonth" color="white" class="h-8! font-bold" @click="placeholder = today">
           Today
-        </button>
-        <CalendarPrev class="schedule-control size-10" aria-label="Previous month">
+        </ui-button>
+        <CalendarPrev :as="UiButton" color="white" class="flex items-center justify-center p-0! size-8!" aria-label="Previous month">
           <Icon name="lucide:chevron-left" size="20" />
         </CalendarPrev>
-        <CalendarNext class="schedule-control size-10" aria-label="Next month">
+        <CalendarNext :as="UiButton" color="white" class="flex items-center justify-center p-0! size-8!" aria-label="Next month">
           <Icon name="lucide:chevron-right" size="20" />
         </CalendarNext>
       </div>
@@ -153,33 +153,32 @@ function openDate(date: DateValue | DateValue[] | undefined) {
                   'schedule-day--today': dayInfo(date).isToday
                 }"
               >
-                <span class="flex items-center justify-between gap-0.5">
-                  <span
-                    class="flex items-center justify-center min-w-5 h-5 px-0.75 rounded-full text-xs font-bold tabular-nums"
-                    :class="dayInfo(date).isToday ? 'bg-primary text-white' : dayInfo(date).entry ? 'text-text-primary' : 'text-text-secondary'"
-                  >
-                    {{ dayValue }}
-                  </span>
-                  <template v-if="dayInfo(date).entry">
-                    <span v-if="!dayInfo(date).remaining" class="flex items-center justify-center shrink-0 size-4 rounded-full bg-success-tint text-success-ink">
-                      <Icon name="lucide:check" size="10" />
-                    </span>
-                    <span
-                      v-else
-                      class="flex items-center justify-center shrink-0 size-4 rounded-full text-[10px] font-extrabold tabular-nums text-text-primary"
-                      :class="dayInfo(date).isPast ? 'bg-warning' : 'bg-track'"
-                    >
-                      {{ dayInfo(date).remaining }}
-                    </span>
-                  </template>
+                <span
+                  class="self-center flex items-center justify-center shrink-0 min-w-7 h-7 px-1 rounded-full text-[16px] font-extrabold tracking-[-0.01em] tabular-nums"
+                  :class="dayInfo(date).isToday ? 'bg-primary text-white' : dayInfo(date).entry ? 'text-text-primary' : 'text-text-secondary'"
+                >
+                  {{ dayValue }}
                 </span>
                 <span
                   v-if="dayInfo(date).entry"
-                  class="flex items-center justify-center h-4.5 px-0.5 rounded-md overflow-hidden text-[9.5px] font-extrabold tracking-[0.02em]"
+                  class="flex items-center justify-center shrink-0 h-4.5 px-0.5 rounded-md overflow-hidden text-[9.5px] font-extrabold tracking-[0.02em]"
                   :style="dayInfo(date).pillStyle"
                 >
-                  {{ dayInfo(date).entry!.type }}
+                  {{ dayInfo(date).entry!.baseName }}
                 </span>
+                <!-- Logbook detail: small and worded, under the duty, so it can't be read as a date -->
+                <template v-if="dayInfo(date).entry">
+                  <span v-if="!dayInfo(date).remaining" class="flex items-center justify-center shrink-0 h-4 text-success-ink">
+                    <Icon name="lucide:check" size="12" />
+                  </span>
+                  <span
+                    v-else
+                    class="flex items-center justify-center shrink-0 h-4 rounded-[5px] text-[9.5px] font-extrabold whitespace-nowrap tabular-nums"
+                    :class="dayInfo(date).isPast ? 'bg-warning-tint text-warning-ink' : 'text-text-secondary'"
+                  >
+                    {{ dayInfo(date).remaining }} left
+                  </span>
+                </template>
                 <span v-else class="text-center text-[10px] leading-4.5 font-semibold text-text-secondary">Off</span>
               </CalendarCellTrigger>
             </CalendarCell>
@@ -192,10 +191,10 @@ function openDate(date: DateValue | DateValue[] | undefined) {
       <p class="font-bold text-lg">Duty types</p>
       <ui-card class="flex flex-col gap-4">
         <ul class="grid grid-cols-2 gap-x-4 gap-y-3">
-          <li v-for="type in DUTY_TYPES" :key="type.code" class="flex items-center gap-2 text-[13px]">
-            <span class="size-3.5 shrink-0 rounded-sm" :style="{ backgroundColor: type.base_color }" />
+          <li v-for="type in legend" :key="type.code" class="flex items-start gap-1.5 text-[13px]">
+            <span class="size-3.5 shrink-0 rounded-sm" :style="{ backgroundColor: type.color }" />
             <span class="font-extrabold">{{ type.code }}</span>
-            <span class="font-medium text-text-secondary">{{ type.name }}</span>
+            <span class="font-medium text-text-secondary">{{ type.label }}</span>
           </li>
         </ul>
         <div class="border-t border-track" />
@@ -229,25 +228,8 @@ function openDate(date: DateValue | DateValue[] | undefined) {
 <style scoped lang="scss">
 @reference "../../assets/css/tailwind.css";
 
-.schedule-control {
-  @apply flex items-center justify-center h-10 rounded-full border border-neutral-200 bg-white cursor-pointer transition-colors;
-
-  &:hover:not(:disabled) {
-    @apply bg-background border-neutral-300;
-  }
-
-  &:active:not(:disabled) {
-    @apply bg-neutral-100;
-  }
-
-  &:disabled,
-  &[data-disabled] {
-    @apply opacity-40 cursor-not-allowed;
-  }
-}
-
 .schedule-day {
-  @apply flex flex-col justify-between min-w-0 h-16 p-1 rounded-[10px] overflow-hidden text-left cursor-pointer outline-none transition-shadow;
+  @apply flex flex-col items-stretch gap-1 min-w-0 h-21 px-1 py-[5px] rounded-[10px] overflow-hidden cursor-pointer outline-none transition-shadow;
   @apply bg-background border border-dashed border-neutral-300;
 
   &--duty {
@@ -259,7 +241,7 @@ function openDate(date: DateValue | DateValue[] | undefined) {
   }
 
   &:hover {
-    @apply ring-2 ring-primary/20;
+    @apply ring-1 ring-primary/20;
   }
 
   &:active {
