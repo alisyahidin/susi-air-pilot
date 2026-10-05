@@ -7,6 +7,12 @@ import {
   hoursToLimitQuerySchema,
   hoursToLimitResponseSchema,
 } from './dto/hours-to-limit.dto.js';
+import {
+  type FlightHoursSummaryQueryDto,
+  type FlightHoursSummaryResponseDto,
+  flightHoursSummaryQuerySchema,
+  flightHoursSummaryResponseSchema,
+} from './dto/summary.dto.js';
 import { TODAY, type Today } from '../../common/today.js';
 import { FlightHoursService } from './flight-hours.service.js';
 
@@ -24,5 +30,14 @@ export class FlightHoursController {
     @Query({ schema: hoursToLimitQuerySchema }) query: HoursToLimitQueryDto,
   ): Promise<HoursToLimitResponseDto> {
     return this.flightHours.hoursToLimit(user.id, query.date ?? this.today());
+  }
+
+  @Get('summary')
+  @SerializeOptions({ schema: flightHoursSummaryResponseSchema })
+  summary(
+    @CurrentUser() user: User,
+    @Query({ schema: flightHoursSummaryQuerySchema }) query: FlightHoursSummaryQueryDto,
+  ): Promise<FlightHoursSummaryResponseDto> {
+    return this.flightHours.summary(user.id, query.range, query.date ?? this.today());
   }
 }

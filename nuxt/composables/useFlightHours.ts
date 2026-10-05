@@ -58,3 +58,35 @@ export function useHoursToLimit() {
     }
   )
 }
+
+export type SummaryRange = '1w' | '1m' | '3m' | '6m' | '1y'
+
+export interface FlightHoursSummary {
+  date: string
+  range: SummaryRange
+  windowDays: number
+  limit: number
+  max: number
+  today: { hours: number, remaining: number, status: LimitStatus }
+  points: { date: string, hours: number, status: LimitStatus, projected: boolean }[]
+}
+
+/**
+ * Rolling totals for `range` on the days around the simulated today (useToday), for the trend
+ * chart. Refetches when `range` changes; the previous range's data stays until the new one
+ * arrives, so the chart doesn't blank out. Loads in the browser only.
+ */
+export function useFlightHoursSummary(range: Ref<SummaryRange>) {
+  const { $api } = useNuxtApp()
+  const today = useToday()
+
+  return useLazyAsyncData(
+    `flight-hours-summary-${today}`,
+    () => $api<FlightHoursSummary>('/flight-hours/summary', { query: { range: range.value, date: today } }),
+    {
+      server: false,
+      watch: [range],
+      transform: data => ({ ...data, todayBadge: STATUSES[data.today.status] })
+    }
+  )
+}

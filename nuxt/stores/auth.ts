@@ -21,7 +21,7 @@ const REFRESH_EARLY_MS = 30_000 // refresh this long before the access token exp
 let inflightRefresh: Promise<boolean> | null = null
 
 export function useApiBase() {
-  return new URL('/api/v1', useRuntimeConfig().public.apiBaseUrl).toString();
+  return '/api/v1';
 }
 
 /**

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import type { HoursToLimitResponseDto, LimitStatus } from './dto/hours-to-limit.dto.js';
+import type { FlightHoursSummaryResponseDto, SummaryRange } from './dto/summary.dto.js';
 import { FlightHoursRepository } from './flight-hours.repository.js';
 
 const PERIODS = [
@@ -30,6 +31,30 @@ export class FlightHoursService {
     );
 
     return { date, limits: results };
+  }
+
+  async summary(userId: string, range: SummaryRange, date: string): Promise<FlightHoursSummaryResponseDto> {
+    const { limit, max, windowDays, displayRangeDays } = await this.flightHours.chartBounds(range);
+
+    const offsets = Array.from({ length: displayRangeDays * 2 + 1 }, (_, i) => i - displayRangeDays);
+    const points = await Promise.all(
+      offsets.map(async (offset) => {
+        const day = shiftDays(date, offset);
+        const hours = round1(await this.flightHours.hoursBetween(userId, shiftDays(day, -(windowDays - 1)), day));
+        return { date: day, hours, status: statusOf(hours, limit), projected: offset > 0 };
+      }),
+    );
+
+    const todayHours = points[displayRangeDays]!.hours;
+    return {
+      date,
+      range,
+      windowDays,
+      limit,
+      max,
+      today: { hours: todayHours, remaining: round1(limit - todayHours), status: statusOf(todayHours, limit) },
+      points,
+    };
   }
 }
 
