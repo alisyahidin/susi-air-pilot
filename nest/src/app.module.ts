@@ -7,6 +7,8 @@ import { validationProviders } from './common/validation/index.js';
 import { appConfig, authConfig, envSchema, type AuthConfig } from './config/index.js';
 import { MockDbModule } from './db/mock/index.js';
 import { AuthModule } from './modules/auth/auth.module.js';
+import { DocumentsModule } from './modules/documents/documents.module.js';
+import { FlightHoursModule } from './modules/flight-hours/flight-hours.module.js';
 import { PilotModule } from './modules/pilot/pilot.module.js';
 import { UsersModule } from './modules/users/users.module.js';
 
@@ -31,6 +33,8 @@ import { UsersModule } from './modules/users/users.module.js';
     UsersModule,
     AuthModule,
     PilotModule,
+    FlightHoursModule,
+    DocumentsModule,
   ],
   providers: [
     // Built-in zod validation: @Body({ schema }) for input, @SerializeOptions({ schema }) for output

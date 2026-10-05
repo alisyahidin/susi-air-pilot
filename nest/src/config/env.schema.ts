@@ -12,6 +12,11 @@ export const envSchema = z
   .object({
     NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
     PORT: z.coerce.number().int().positive().default(3001),
+    // Simulated "today" (YYYY-MM-DD) so the mock data lines up; unset or empty uses the real date
+    TODAY: z.preprocess(
+      value => (value === '' ? undefined : value),
+      z.iso.date({ error: 'TODAY must be a date like 2026-05-15' }).optional(),
+    ),
     // Browser origins allowed to call the API (comma-separated), e.g. the Nuxt app
     CORS_ORIGIN: z
       .string()

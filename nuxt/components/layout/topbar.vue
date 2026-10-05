@@ -15,6 +15,12 @@ const props = defineProps<{
 
 const { isAuthenticated, user, logout } = useAuth()
 
+const todayLabel = (() => {
+  const date = new Date(`${useToday()}T00:00:00Z`)
+  const part = (options: Intl.DateTimeFormatOptions) => date.toLocaleDateString('en-US', { ...options, timeZone: 'UTC' })
+  return `${part({ weekday: 'short' })}, ${part({ day: 'numeric', month: 'short' })}`
+})()
+
 const initials = computed(() =>
   (user.value?.name ?? '').split(/\s+/).filter(Boolean).slice(0, 2).map(part => part[0]!.toUpperCase()).join('')
 )
@@ -28,7 +34,7 @@ const initials = computed(() =>
     <div class="flex items-center gap-2">
       <div class="flex items-center gap-2 h-8 px-3 rounded-full border border-border bg-background">
         <Icon name="lucide:calendar" />
-        <span class="text-[13px] font-semibold">Fri, 15 May</span>
+        <span class="text-[13px] font-semibold">{{ todayLabel }}</span>
       </div>
 
       <DropdownMenuRoot v-if="isAuthenticated && user && !props.hideAvatar">

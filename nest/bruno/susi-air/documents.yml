@@ -1,11 +1,11 @@
 info:
-  name: Pilot Me
+  name: Documents
   type: http
-  seq: 2
+  seq: 4
 
 http:
   method: GET
-  url: "{{baseUrl}}/pilot/me"
+  url: "{{baseUrl}}/documents"
   headers:
     - name: Authorization
       value: Bearer {{accessToken}}

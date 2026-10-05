@@ -9,7 +9,7 @@ const route = useRoute()
 const label = computed(() => {
   try {
     const date = parseDate(String(route.params.date))
-    return date.toDate('UTC').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })
+    return date.toDate('UTC').toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })
   } catch {
     return String(route.params.date)
   }

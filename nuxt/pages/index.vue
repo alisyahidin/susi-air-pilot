@@ -6,22 +6,8 @@ definePageMeta({
 
 const { user } = useAuth()
 const { data: pilot, status: pilotStatus } = usePilotMe()
-
-type DocumentStatus = 'valid' | 'expiring' | 'expired'
-
-const documents: { name: string, expiry: string, status: DocumentStatus, remaining: string }[] = [
-  { name: 'Instrument Rating', expiry: '30 Apr 2026', status: 'expired', remaining: 'Expired 15 days ago' },
-  { name: 'Medical Certificate, Class 1', expiry: '02 Jun 2026', status: 'expiring', remaining: '18 days left' },
-  { name: 'Proficiency Check, C208B', expiry: '08 Jul 2026', status: 'expiring', remaining: '54 days left' },
-  { name: 'ICAO English Proficiency', expiry: '20 Nov 2027', status: 'valid', remaining: '1 yr 6 mo left' },
-  { name: 'Commercial Pilot Licence', expiry: '12 Mar 2028', status: 'valid', remaining: '1 yr 9 mo left' }
-]
-
-const DOCUMENT_BADGE = {
-  valid: { color: 'success', label: 'Valid' },
-  expiring: { color: 'warning', label: 'Expiring soon' },
-  expired: { color: 'danger', label: 'Expired' }
-} as const
+const { data: hoursToLimit, status: hoursToLimitStatus } = useHoursToLimit()
+const { data: documents, status: documentsStatus } = useDocuments()
 </script>
 
 <template>
@@ -40,74 +26,37 @@ const DOCUMENT_BADGE = {
           {{ pilot.formattedTotalFlightHours }} <span class="text-neutral-200 text-base">h</span>
         </p>
         <p v-else-if="pilotStatus === 'error'" class="text-sm font-semibold text-neutral-200">Couldn't load your flight hours</p>
-        <span v-else class="block h-7 w-24 mt-0.5 rounded-md bg-navy-600 animate-pulse" aria-label="Loading flight hours" />
+        <span v-else class="block h-8 w-24 mt-1 rounded-md bg-navy-600 animate-pulse" aria-label="Loading flight hours" />
       </div>
     </ui-card>
 
     <!-- Hours to Limit -->
     <div class="space-y-2">
       <p class="font-bold text-lg">Hours to Limit</p>
-      <div class="grid grid-cols-2 gap-2">
-        <ui-card class="flex flex-col min-w-0 items-start gap-2">
-          <div>
-            <p class="text-[16px] font-bold">Daily</p>
-            <p class="text-text-secondary font-medium">Today</p>
-          </div>
-          <ui-badge color="success" variant="icon" icon="lucide:check">Within Limit</ui-badge>
-          <div>
-            <p class="text-xl font-extrabold">5.6 <span class="text-text-secondary text-base">h</span></p>
-            <p class="text-text-secondary font-medium">of 8 hour limit</p>
-          </div>
-          <div class="w-full space-y-2">
-            <ui-progress :value="6" :max="10" color="success" />
-            <p class="font-semibold">2.4 hour remaining</p>
-          </div>
-        </ui-card>
-        <ui-card class="flex flex-col min-w-0 items-start gap-2">
-          <div>
-            <p class="text-[16px] font-bold">Weekly</p>
-            <p class="text-text-secondary font-medium">Rolling 7 days</p>
-          </div>
-          <ui-badge color="danger" variant="icon">Over limit</ui-badge>
-          <div>
-            <p class="text-xl font-extrabold">42.0 <span class="text-text-secondary text-base">h</span></p>
-            <p class="text-text-secondary font-medium">of 40 hour limit</p>
-          </div>
-          <div class="w-full space-y-2">
-            <ui-progress :value="10" :max="10" color="danger" />
-            <p class="font-semibold">2.0 hour over limit</p>
-          </div>
-        </ui-card>
-        <ui-card class="flex flex-col min-w-0 items-start gap-2">
-          <div>
-            <p class="text-[16px] font-bold">Monthly</p>
-            <p class="text-text-secondary font-medium">Rolling 30 days</p>
-          </div>
-          <ui-badge color="warning" variant="icon">Approaching limit</ui-badge>
-          <div>
-            <p class="text-xl font-extrabold">84.1 <span class="text-text-secondary text-base">h</span></p>
-            <p class="text-text-secondary font-medium">of 100 hour limit</p>
-          </div>
-          <div class="w-full space-y-2">
-            <ui-progress :value="9" :max="10" color="warning" />
-            <p class="font-semibold">2.4 hour remaining</p>
-          </div>
-        </ui-card>
-        <ui-card class="flex flex-col min-w-0 items-start gap-2">
-          <div>
-            <p class="text-[16px] font-bold">Annual</p>
-            <p class="text-text-secondary font-medium">Rolling 365 days</p>
-          </div>
-          <ui-badge color="success" variant="icon" icon="lucide:check">Within Limit</ui-badge>
-          <div>
-            <p class="text-xl font-extrabold">737.5 <span class="text-text-secondary text-base">h</span></p>
-            <p class="text-text-secondary font-medium">of 1,050 hour limit</p>
-          </div>
-          <div class="w-full space-y-2">
-            <ui-progress :value="9" :max="10" color="success" />
-            <p class="font-semibold">2.4 hour remaining</p>
-          </div>
-        </ui-card>
+      <p v-if="hoursToLimitStatus === 'error'" class="text-text-secondary font-medium">Couldn't load your hours to limit.</p>
+      <div v-else class="grid grid-cols-2 gap-2">
+        <template v-if="hoursToLimit">
+          <ui-card v-for="limit in hoursToLimit.limits" :key="limit.period" class="flex flex-col min-w-0 items-start gap-2">
+            <div>
+              <p class="text-[16px] font-bold">{{ limit.title }}</p>
+              <p class="text-text-secondary font-medium">{{ limit.window }}</p>
+            </div>
+            <ui-badge :color="limit.badge.color" variant="icon" :icon="limit.badge.icon">{{ limit.badge.label }}</ui-badge>
+            <div>
+              <p class="text-xl font-extrabold tabular-nums">{{ limit.formattedHours }} <span class="text-text-secondary text-base">h</span></p>
+              <p class="text-text-secondary font-medium">of {{ limit.formattedLimit }} hour limit</p>
+            </div>
+            <div class="w-full space-y-2">
+              <ui-progress :value="limit.hours" :max="limit.limit" :color="limit.badge.color" :label="`${limit.title} hours`" />
+              <p class="font-semibold">{{ limit.remainingText }}</p>
+            </div>
+          </ui-card>
+        </template>
+        <template v-else>
+          <ui-card v-for="n in 4" :key="n" class="h-[221px]" aria-label="Loading hours to limit">
+            <div class="animate-pulse size-full rounded-xs bg-neutral-50" />
+          </ui-card>
+        </template>
       </div>
     </div>
 
@@ -126,11 +75,12 @@ const DOCUMENT_BADGE = {
           <Icon name="lucide:chevron-right" size="16" />
         </button>
       </div>
-      <ui-card class="p-2!">
-        <ul>
+      <p v-if="documentsStatus === 'error'" class="text-text-secondary font-medium">Couldn't load your documents.</p>
+      <ui-card v-else class="p-2!">
+        <ul v-if="documents">
           <li
-            v-for="doc in documents"
-            :key="doc.name"
+            v-for="doc in documents.documents"
+            :key="doc.id"
             class="flex items-center justify-between gap-3 px-2 py-3 not-first:border-t not-first:border-border"
           >
             <div class="flex items-center gap-3 min-w-0">
@@ -138,16 +88,20 @@ const DOCUMENT_BADGE = {
                 <Icon name="lucide:file-text" size="18" />
               </span>
               <div class="min-w-0">
-                <p class="font-bold">{{ doc.name }}</p>
-                <p class="text-sm font-medium text-text-secondary">
-                  {{ doc.status === 'expired' ? 'Expired' : 'Expires' }} {{ doc.expiry }}
-                </p>
+                <p class="font-bold">{{ doc.label }}</p>
+                <p class="text-sm font-medium text-text-secondary">{{ doc.expiryText }}</p>
               </div>
             </div>
             <div class="flex flex-col items-end gap-1 shrink-0">
-              <ui-badge :color="DOCUMENT_BADGE[doc.status].color">{{ DOCUMENT_BADGE[doc.status].label }}</ui-badge>
-              <p class="text-sm font-semibold tabular-nums">{{ doc.remaining }}</p>
+              <ui-badge :color="doc.badge.color">{{ doc.badge.label }}</ui-badge>
+              <p class="text-sm font-semibold tabular-nums">{{ doc.remainingText }}</p>
             </div>
+          </li>
+        </ul>
+        <ul v-else aria-label="Loading documents">
+          <li v-for="n in 5" :key="n" class="flex items-center gap-3 px-2 py-3 not-first:border-t not-first:border-border">
+            <span class="shrink-0 size-[46px] rounded-[10px] bg-neutral-50 animate-pulse" />
+            <span class="flex-1 h-[46px] rounded-md bg-neutral-50 animate-pulse" />
           </li>
         </ul>
       </ui-card>

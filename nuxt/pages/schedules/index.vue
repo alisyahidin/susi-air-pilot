@@ -33,7 +33,7 @@ const entries = computed(() =>
 )
 
 const monthLabel = computed(() =>
-  placeholder.value.toDate('UTC').toLocaleDateString('en-GB', { month: 'long', year: 'numeric', timeZone: 'UTC' })
+  placeholder.value.toDate('UTC').toLocaleDateString('en-US', { month: 'long', year: 'numeric', timeZone: 'UTC' })
 )
 const isCurrentMonth = computed(() => isSameMonth(placeholder.value, SCHEDULE_TODAY))
 const isFutureMonth = computed(() => placeholder.value.compare(SCHEDULE_TODAY) > 0 && !isCurrentMonth.value)
@@ -56,7 +56,7 @@ function dayInfo(date: DateValue) {
   const color = (entry && dutyTypes[entry.type]?.base_color) || '#9AA3B0'
   const isToday = isSameDay(date, SCHEDULE_TODAY)
   const isPast = date.compare(SCHEDULE_TODAY) <= 0
-  const weekday = date.toDate('UTC').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' })
+  const weekday = date.toDate('UTC').toLocaleDateString('en-US', { weekday: 'long', day: 'numeric', month: 'long', timeZone: 'UTC' })
   return {
     entry,
     remaining,
