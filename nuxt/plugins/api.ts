@@ -1,4 +1,7 @@
-import { FetchError, type FetchOptions } from 'ofetch'
+import { FetchError } from 'ofetch'
+
+// Nuxt's $fetch options (Nitro's types), which the wrapped client takes
+type ApiOptions = NonNullable<Parameters<typeof $fetch>[1]>
 
 /**
  * `$api`: $fetch for the Nest API with the in-memory access token as a Bearer header.
@@ -15,14 +18,14 @@ export default defineNuxtPlugin({
     const auth = useAuthStore()
     const raw = $fetch.create({ baseURL: useApiBase() })
 
-    async function send<T>(request: string, options: FetchOptions<'json'>): Promise<T> {
+    async function send<T>(request: string, options: ApiOptions): Promise<T> {
       const headers = new Headers(options.headers as HeadersInit | undefined)
       const token = await auth.getAccessToken()
       if (token) headers.set('Authorization', `Bearer ${token}`)
       return raw<T>(request, { ...options, headers })
     }
 
-    async function api<T = unknown>(request: string, options: FetchOptions<'json'> = {}): Promise<T> {
+    async function api<T = unknown>(request: string, options: ApiOptions = {}): Promise<T> {
       try {
         return await send<T>(request, options)
       } catch (error) {
