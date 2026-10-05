@@ -16,9 +16,9 @@ const { data: documents, status: documentsStatus } = useDocuments()
       <p class="text-sm font-medium text-text-secondary">Welcome back,</p>
       <h1 class="text-lg font-bold">{{ user?.name }}</h1>
     </div>
-    <ui-card class="flex items-center gap-4 bg-primary!">
+    <ui-card class="relative flex items-center gap-4 bg-primary! overflow-hidden">
       <div class="flex items-center justify-center rounded-full p-3 bg-navy-600">
-        <Icon name="lucide:clock" class="text-xl! text-white" />
+        <Icon name="lucide:plane-takeoff" class="text-xl! text-white" />
       </div>
       <div>
         <p class="text-neutral-200">Total flight hours</p>
@@ -28,6 +28,7 @@ const { data: documents, status: documentsStatus } = useDocuments()
         <p v-else-if="pilotStatus === 'error'" class="text-sm font-semibold text-neutral-200">Couldn't load your flight hours</p>
         <span v-else class="block h-8 w-24 mt-1 rounded-md bg-navy-600 animate-pulse" aria-label="Loading flight hours" />
       </div>
+      <Icon name="ic:baseline-airplanemode-active" class="absolute -right-4 -bottom-7/10 rotate-60 text-[164px]! text-white opacity-10" />
     </ui-card>
 
     <!-- Hours to Limit -->

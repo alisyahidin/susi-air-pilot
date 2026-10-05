@@ -188,42 +188,41 @@ function openDate(date: DateValue | DateValue[] | undefined) {
       </CalendarGrid>
     </ui-card>
 
-    <ui-card class="flex flex-col gap-4">
-      <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 mb-2">
-        <h2 class="text-lg font-bold">Duty types</h2>
-        <span class="text-sm font-medium text-text-secondary">Select a date to open its detail page</span>
-      </div>
-      <ul class="grid grid-cols-2 gap-x-4 gap-y-3">
-        <li v-for="type in DUTY_TYPES" :key="type.code" class="flex items-center gap-2 text-[13px]">
-          <span class="size-3.5 shrink-0 rounded-sm" :style="{ backgroundColor: type.base_color }" />
-          <span class="font-extrabold">{{ type.code }}</span>
-          <span class="font-medium text-text-secondary">{{ type.name }}</span>
-        </li>
-      </ul>
-      <div class="border-t border-track" />
-      <ul class="grid grid-cols-1 gap-x-4 gap-y-2.5 text-[13px] font-semibold text-text-secondary">
-        <li class="flex items-center gap-2">
-          <span class="flex items-center justify-center shrink-0 size-5 rounded-full bg-success-tint text-success-ink"><Icon name="lucide:check" size="12" /></span>
-          Logbook complete
-        </li>
-        <li class="flex items-center gap-2">
-          <span class="flex items-center justify-center shrink-0 size-5 rounded-full bg-warning text-text-primary text-xs font-extrabold">2</span>
-          Logbook entries remaining
-        </li>
-        <li class="flex items-center gap-2">
-          <span class="flex items-center justify-center shrink-0 size-5 rounded-full bg-track text-text-primary text-xs font-extrabold">2</span>
-          Upcoming duties
-        </li>
-        <li class="flex items-center gap-2">
-          <span class="shrink-0 size-5 rounded-md border border-dashed border-neutral-400 bg-background" />
-          No duty scheduled
-        </li>
-        <li class="flex items-center gap-2">
-          <span class="shrink-0 size-5 rounded-md border-2 border-primary bg-white" />
-          Today
-        </li>
-      </ul>
-    </ui-card>
+    <div class="space-y-2">
+      <p class="font-bold text-lg">Duty types</p>
+      <ui-card class="flex flex-col gap-4">
+        <ul class="grid grid-cols-2 gap-x-4 gap-y-3">
+          <li v-for="type in DUTY_TYPES" :key="type.code" class="flex items-center gap-2 text-[13px]">
+            <span class="size-3.5 shrink-0 rounded-sm" :style="{ backgroundColor: type.base_color }" />
+            <span class="font-extrabold">{{ type.code }}</span>
+            <span class="font-medium text-text-secondary">{{ type.name }}</span>
+          </li>
+        </ul>
+        <div class="border-t border-track" />
+        <ul class="grid grid-cols-1 gap-x-4 gap-y-2.5 text-[13px] font-semibold text-text-secondary">
+          <li class="flex items-center gap-2">
+            <span class="flex items-center justify-center shrink-0 size-5 rounded-full bg-success-tint text-success-ink"><Icon name="lucide:check" size="12" /></span>
+            Logbook complete
+          </li>
+          <li class="flex items-center gap-2">
+            <span class="flex items-center justify-center shrink-0 size-5 rounded-full bg-warning text-text-primary text-xs font-extrabold">2</span>
+            Logbook entries remaining
+          </li>
+          <li class="flex items-center gap-2">
+            <span class="flex items-center justify-center shrink-0 size-5 rounded-full bg-track text-text-primary text-xs font-extrabold">2</span>
+            Upcoming duties
+          </li>
+          <li class="flex items-center gap-2">
+            <span class="shrink-0 size-5 rounded-md border border-dashed border-neutral-400 bg-background" />
+            No duty scheduled
+          </li>
+          <li class="flex items-center gap-2">
+            <span class="shrink-0 size-5 rounded-md border-2 border-primary bg-white" />
+            Today
+          </li>
+        </ul>
+      </ui-card>
+    </div>
   </CalendarRoot>
 </template>
 

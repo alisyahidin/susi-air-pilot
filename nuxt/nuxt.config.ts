@@ -10,7 +10,7 @@ export default defineNuxtConfig({
 
   // for handling cookie refresh token set by backend service in frontend
   routeRules: {
-    '/api/**': { proxy: new URL('/api/**', process.env.API_BASE_URL ?? 'https://susi-air-pilot.fly.dev').toString() }
+    '/api/v1/**': { proxy: new URL('/api/v1/**', process.env.API_BASE_URL ?? 'https://susi-air-pilot.fly.dev').toString() }
   },
 
   runtimeConfig: {
