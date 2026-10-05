@@ -71,7 +71,7 @@ const { data: documents, status: documentsStatus } = useDocuments()
     <div class="space-y-2">
       <div class="flex items-center justify-between">
         <p class="font-bold text-lg">My Documents</p>
-        <button type="button" class="flex items-center gap-0.5 -mr-1.5 h-11 pl-3 pr-1.5 rounded-full text-[13px] font-bold cursor-pointer hover:bg-neutral-50 active:bg-neutral-100">
+        <button type="button" class="flex items-center gap-0.5 -mr-1.5 h-9 pl-3 pr-1.5 rounded-full text-[13px] font-bold cursor-pointer hover:bg-neutral-50 active:bg-neutral-100">
           View all
           <Icon name="lucide:chevron-right" size="16" />
         </button>

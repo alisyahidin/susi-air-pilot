@@ -8,6 +8,7 @@ import { appConfig, authConfig, envSchema, type AuthConfig } from './config/inde
 import { MockDbModule } from './db/mock/index.js';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { DocumentsModule } from './modules/documents/documents.module.js';
+import { SchedulesModule } from './modules/schedules/schedules.module.js';
 import { FlightHoursModule } from './modules/flight-hours/flight-hours.module.js';
 import { PilotModule } from './modules/pilot/pilot.module.js';
 import { UsersModule } from './modules/users/users.module.js';
@@ -35,6 +36,7 @@ import { UsersModule } from './modules/users/users.module.js';
     PilotModule,
     FlightHoursModule,
     DocumentsModule,
+    SchedulesModule,
   ],
   providers: [
     // Built-in zod validation: @Body({ schema }) for input, @SerializeOptions({ schema }) for output

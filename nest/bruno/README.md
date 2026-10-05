@@ -39,6 +39,7 @@ Requests build their URL from the `baseUrl` variable, e.g. `{{baseUrl}}/auth/log
 | Flight Hours Limits | `GET {{baseUrl}}/flight-hours/limits?date=2026-05-15` | `Bearer {{accessToken}}` |
 | Documents | `GET {{baseUrl}}/documents` | `Bearer {{accessToken}}` |
 | Flight Hours Summary | `GET {{baseUrl}}/flight-hours/summary?range=1w&date=2026-05-15` | `Bearer {{accessToken}}` |
+| Schedules | `GET {{baseUrl}}/schedules?year=2026&month=5` | `Bearer {{accessToken}}` |
 
 ### Auth Login
 
@@ -76,6 +77,10 @@ The signed-in pilot's documents, soonest expiry first, each with `daysRemaining`
 ### Flight Hours Summary
 
 Data for the home page's trend chart. For `range` (`1w`, `1m`, `3m`, `6m`, `1y`; default `1w`) it returns the window, limit and suggested axis `max`, the rolling total on `date` (`today`, with `remaining` and `status`), and 15 `points`: the rolling total on each day from 7 days before `date` to 7 after, each with a `status` and `projected: true` for days after `date`. `date` works as in Flight Hours Limits.
+
+### Schedules
+
+The signed-in pilot's duty days in one month: each with its `dutyType`, `baseName` (the base airport on duty days, else the duty code) and `baseColor`, `status` (`upcoming` or `completed`), and how many of the day's `countSchedules` are logged (`countLogbooks`). Also returns the duty `legend` and `available`, the first and last month that have duties (the mock data covers April to June 2026). Without `year` and `month` it loads the month of the API's `TODAY`; an invalid one returns `400`.
 
 ## Test accounts
 

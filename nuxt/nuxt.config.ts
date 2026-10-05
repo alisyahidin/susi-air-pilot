@@ -31,8 +31,7 @@ export default defineNuxtConfig({
   modules: ['@nuxt/icon', '@pinia/nuxt'],
 
   icon: {
-    serverBundle: {
-      collections: ['lucide']
-    }
+    mode: 'css',
+    cssLayer: 'base'
   }
 })
