@@ -47,7 +47,3 @@ function shiftDays(date: string, days: number): string {
 function round1(value: number): number {
   return Math.round(value * 10) / 10;
 }
-
-export function todayUtc(): string {
-  return new Date().toISOString().slice(0, 10);
-}

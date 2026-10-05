@@ -1,6 +1,6 @@
 import type { NestFastifyApplication } from '@nestjs/platform-fastify';
 import { createTestApp } from '../../testing/create-test-app.js';
-import { statusOf, todayUtc } from './flight-hours.service.js';
+import { statusOf } from './flight-hours.service.js';
 
 describe('statusOf', () => {
   it('is within below 80% of the limit, approaching from 80%, at_limit when equal, over beyond', () => {
@@ -17,6 +17,7 @@ describe('FlightHoursController (GET /api/v1/flight-hours/limits)', () => {
   let accessToken: string;
 
   beforeAll(async () => {
+    vi.stubEnv('TODAY', '2026-05-15');
     app = await createTestApp();
     const res = await app.inject({
       method: 'POST',
@@ -26,7 +27,10 @@ describe('FlightHoursController (GET /api/v1/flight-hours/limits)', () => {
     accessToken = res.json().accessToken;
   });
 
-  afterAll(() => app.close());
+  afterAll(async () => {
+    await app.close();
+    vi.unstubAllEnvs();
+  });
 
   const limits = (query = '', token: string | null = accessToken) =>
     app.inject({
@@ -60,10 +64,10 @@ describe('FlightHoursController (GET /api/v1/flight-hours/limits)', () => {
     expect(res.json().limits.every((l: { hours: number, status: string }) => l.hours === 0 && l.status === 'within')).toBe(true);
   });
 
-  it('defaults to today (UTC) without a date', async () => {
+  it('defaults to TODAY from the environment without a date', async () => {
     const res = await limits();
     expect(res.statusCode).toBe(200);
-    expect(res.json().date).toBe(todayUtc());
+    expect(res.json()).toEqual((await limits('?date=2026-05-15')).json());
   });
 
   it('answers 400 for a malformed date', async () => {

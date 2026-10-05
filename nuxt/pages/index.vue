@@ -7,22 +7,7 @@ definePageMeta({
 const { user } = useAuth()
 const { data: pilot, status: pilotStatus } = usePilotMe()
 const { data: hoursToLimit, status: hoursToLimitStatus } = useHoursToLimit()
-
-type DocumentStatus = 'valid' | 'expiring' | 'expired'
-
-const documents: { name: string, expiry: string, status: DocumentStatus, remaining: string }[] = [
-  { name: 'Instrument Rating', expiry: '30 Apr 2026', status: 'expired', remaining: 'Expired 15 days ago' },
-  { name: 'Medical Certificate, Class 1', expiry: '02 Jun 2026', status: 'expiring', remaining: '18 days left' },
-  { name: 'Proficiency Check, C208B', expiry: '08 Jul 2026', status: 'expiring', remaining: '54 days left' },
-  { name: 'ICAO English Proficiency', expiry: '20 Nov 2027', status: 'valid', remaining: '1 yr 6 mo left' },
-  { name: 'Commercial Pilot Licence', expiry: '12 Mar 2028', status: 'valid', remaining: '1 yr 9 mo left' }
-]
-
-const DOCUMENT_BADGE = {
-  valid: { color: 'success', label: 'Valid' },
-  expiring: { color: 'warning', label: 'Expiring soon' },
-  expired: { color: 'danger', label: 'Expired' }
-} as const
+const { data: documents, status: documentsStatus } = useDocuments()
 </script>
 
 <template>
@@ -69,7 +54,7 @@ const DOCUMENT_BADGE = {
         </template>
         <template v-else>
           <ui-card v-for="n in 4" :key="n" class="h-[221px]" aria-label="Loading hours to limit">
-            <div class="animate-pulse size-full rounded-xs bg-neutral-100" />
+            <div class="animate-pulse size-full rounded-xs bg-neutral-50" />
           </ui-card>
         </template>
       </div>
@@ -90,11 +75,12 @@ const DOCUMENT_BADGE = {
           <Icon name="lucide:chevron-right" size="16" />
         </button>
       </div>
-      <ui-card class="p-2!">
-        <ul>
+      <p v-if="documentsStatus === 'error'" class="text-text-secondary font-medium">Couldn't load your documents.</p>
+      <ui-card v-else class="p-2!">
+        <ul v-if="documents">
           <li
-            v-for="doc in documents"
-            :key="doc.name"
+            v-for="doc in documents.documents"
+            :key="doc.id"
             class="flex items-center justify-between gap-3 px-2 py-3 not-first:border-t not-first:border-border"
           >
             <div class="flex items-center gap-3 min-w-0">
@@ -102,16 +88,20 @@ const DOCUMENT_BADGE = {
                 <Icon name="lucide:file-text" size="18" />
               </span>
               <div class="min-w-0">
-                <p class="font-bold">{{ doc.name }}</p>
-                <p class="text-sm font-medium text-text-secondary">
-                  {{ doc.status === 'expired' ? 'Expired' : 'Expires' }} {{ doc.expiry }}
-                </p>
+                <p class="font-bold">{{ doc.label }}</p>
+                <p class="text-sm font-medium text-text-secondary">{{ doc.expiryText }}</p>
               </div>
             </div>
             <div class="flex flex-col items-end gap-1 shrink-0">
-              <ui-badge :color="DOCUMENT_BADGE[doc.status].color">{{ DOCUMENT_BADGE[doc.status].label }}</ui-badge>
-              <p class="text-sm font-semibold tabular-nums">{{ doc.remaining }}</p>
+              <ui-badge :color="doc.badge.color">{{ doc.badge.label }}</ui-badge>
+              <p class="text-sm font-semibold tabular-nums">{{ doc.remainingText }}</p>
             </div>
+          </li>
+        </ul>
+        <ul v-else aria-label="Loading documents">
+          <li v-for="n in 5" :key="n" class="flex items-center gap-3 px-2 py-3 not-first:border-t not-first:border-border">
+            <span class="shrink-0 size-[46px] rounded-[10px] bg-neutral-50 animate-pulse" />
+            <span class="flex-1 h-[46px] rounded-md bg-neutral-50 animate-pulse" />
           </li>
         </ul>
       </ui-card>
