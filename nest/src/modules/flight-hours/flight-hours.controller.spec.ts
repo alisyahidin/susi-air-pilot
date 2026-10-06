@@ -166,3 +166,77 @@ describe('FlightHoursController (GET /api/v1/flight-hours/summary)', () => {
     expect((await summary('', null)).statusCode).toBe(401);
   });
 });
+
+describe('FlightHoursController (GET /api/v1/flight-hours)', () => {
+  let app: NestFastifyApplication;
+  let accessToken: string;
+
+  beforeAll(async () => {
+    app = await createTestApp();
+    const res = await app.inject({
+      method: 'POST',
+      url: '/api/v1/auth/login',
+      payload: { username: 'johndoe', password: 'susiairtest' },
+    });
+    accessToken = res.json().accessToken;
+  });
+
+  afterAll(() => app.close());
+
+  const flightHours = (query = '', token: string | null = accessToken) =>
+    app.inject({
+      method: 'GET',
+      url: `/api/v1/flight-hours${query}`,
+      headers: token ? { authorization: `Bearer ${token}` } : {},
+    });
+
+  it('returns the hours for each day from `from` to `to`, both inclusive, oldest first', async () => {
+    const res = await flightHours('?from=2026-05-01&to=2026-05-07');
+
+    expect(res.statusCode).toBe(200);
+    expect(res.json()).toEqual([
+      { date: '2026-05-01', hours: 3.8 },
+      { date: '2026-05-02', hours: 0 },
+      { date: '2026-05-03', hours: 0 },
+      { date: '2026-05-04', hours: 4 },
+      { date: '2026-05-05', hours: 0.9 },
+      { date: '2026-05-06', hours: 0 },
+      { date: '2026-05-07', hours: 4.9 },
+    ]);
+  });
+
+  it('leaves a side open when from or to is left out, and returns the whole log without either', async () => {
+    const fromOnly = (await flightHours('?from=2026-05-25')).json();
+    expect(fromOnly).toHaveLength(7);
+    expect(fromOnly.at(-1).date).toBe('2026-05-31');
+
+    const toOnly = (await flightHours('?to=2025-01-05')).json();
+    expect(toOnly.map((d: { date: string }) => d.date)).toEqual([
+      '2024-12-27', '2024-12-28', '2024-12-29', '2024-12-30', '2024-12-31',
+      '2025-01-01', '2025-01-02', '2025-01-03', '2025-01-04', '2025-01-05',
+    ]);
+
+    const all = (await flightHours()).json();
+    expect(all).toHaveLength(521);
+    expect([all[0].date, all.at(-1).date]).toEqual(['2024-12-27', '2026-05-31']);
+  });
+
+  it('returns a single day when from and to are the same, and nothing outside the log', async () => {
+    expect((await flightHours('?from=2026-05-07&to=2026-05-07')).json()).toEqual([{ date: '2026-05-07', hours: 4.9 }]);
+    expect((await flightHours('?from=2030-01-01')).json()).toEqual([]);
+  });
+
+  it('answers 400 for a malformed date or a range that ends before it starts', async () => {
+    const malformed = await flightHours('?from=01-05-2026');
+    expect(malformed.statusCode).toBe(400);
+    expect(malformed.json().errors.from).toEqual(['Use a date like 2026-05-15.']);
+
+    const backwards = await flightHours('?from=2026-05-07&to=2026-05-01');
+    expect(backwards.statusCode).toBe(400);
+    expect(backwards.json().errors.to).toEqual(['Use a date on or after from.']);
+  });
+
+  it('needs a valid access token', async () => {
+    expect((await flightHours('', null)).statusCode).toBe(401);
+  });
+});

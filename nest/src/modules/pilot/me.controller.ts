@@ -14,7 +14,7 @@ export class PilotController {
   async me(@CurrentUser() user: User): Promise<MeResponseDto> {
     return {
       name: user.name,
-      imageUrl: user.image_url,
+      imageUrl: user.imageUrl,
       totalFlightHours: await this.flightHours.totalHoursFor(user.id),
     };
   }

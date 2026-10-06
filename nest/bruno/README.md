@@ -40,6 +40,7 @@ Requests build their URL from the `baseUrl` variable, e.g. `{{baseUrl}}/auth/log
 | Documents | `GET {{baseUrl}}/documents` | `Bearer {{accessToken}}` |
 | Flight Hours Summary | `GET {{baseUrl}}/flight-hours/summary?range=1w&date=2026-05-15` | `Bearer {{accessToken}}` |
 | Schedules | `GET {{baseUrl}}/schedules?year=2026&month=5` | `Bearer {{accessToken}}` |
+| Flight Hours | `GET {{baseUrl}}/flight-hours?from=2026-05-01&to=2026-05-07` | `Bearer {{accessToken}}` |
 
 ### Auth Login
 
@@ -53,7 +54,7 @@ Signs in with a username and password. A successful response returns the access 
     "id": "c9542e84-fe0d-4d20-9552-638b7771f8b8",
     "name": "Udin Sedunia",
     "username": "udin",
-    "image_url": "https://i.pravatar.cc/120?u=udin"
+    "imageUrl": "https://i.pravatar.cc/120?u=udin"
   }
 }
 ```
@@ -81,6 +82,10 @@ Data for the home page's trend chart. For `range` (`1w`, `1m`, `3m`, `6m`, `1y`;
 ### Schedules
 
 The signed-in pilot's duty days in one month: each with its `dutyType`, `baseName` (the base airport on duty days, else the duty code) and `baseColor`, `status` (`upcoming` or `completed`), and how many of the day's `countSchedules` are logged (`countLogbooks`). Also returns the duty `legend` and `available`, the first and last month that have duties (the mock data covers April to June 2026). Without `year` and `month` it loads the month of the API's `TODAY`; an invalid one returns `400`.
+
+### Flight Hours
+
+The signed-in pilot's logged hours for each day from `from` to `to`, both inclusive, oldest first, as `[{ "date": "2026-05-01", "hours": 3.8 }, …]`. Leave out `from` or `to` to leave that side open; leave out both for the whole log (2024-12-27 to 2026-05-31). A malformed date, or a `to` before `from`, returns `400`.
 
 ## Test accounts
 
