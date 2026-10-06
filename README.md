@@ -176,6 +176,7 @@ The legend under the calendar is rendered from the API's legend, and tapping a d
 
 - Implement proper logging.
 - Improve auth session storage.
+- Add OpenAPI docs using swagger
 
 ### Others
 
