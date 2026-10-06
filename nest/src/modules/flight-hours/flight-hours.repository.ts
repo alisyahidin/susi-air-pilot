@@ -27,6 +27,13 @@ export class FlightHoursRepository {
     return this.db.flightHours.pilot.totalFlightHours;
   }
 
+  async entriesBetween(_userId: string, from?: string, to?: string): Promise<{ date: string; hours: number }[]> {
+    return this.db.flightHours.flightHours
+      .filter(entry => (!from || entry.date >= from) && (!to || entry.date <= to))
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .map(({ date, hours }) => ({ date, hours }));
+  }
+
   async hoursBetween(_userId: string, from: string, to: string): Promise<number> {
     return this.db.flightHours.flightHours
       .filter(entry => entry.date >= from && entry.date <= to)

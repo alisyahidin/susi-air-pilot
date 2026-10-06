@@ -11,7 +11,6 @@ export interface ScheduleDay {
   date: string
   status: 'upcoming' | 'completed'
   dutyType: string
-  /** Short label for the day: the base airport on duty days, else the duty code */
   baseName: string
   baseColor: string
   countSchedules: number
@@ -21,16 +20,11 @@ export interface ScheduleDay {
 export interface MonthSchedule {
   year: number
   month: number
-  /** First and last month (YYYY-MM) that have duties; null when there are none */
   available: { from: string, to: string } | null
   legend: DutyLegend[]
   days: ScheduleDay[]
 }
 
-/**
- * The signed-in pilot's duties in the month `month` is in, refetched when it moves to another
- * month. Loads in the browser only, like every signed-in request.
- */
 export function useMonthSchedule(month: Ref<DateValue>) {
   const { $api } = useNuxtApp()
 

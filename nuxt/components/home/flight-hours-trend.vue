@@ -15,12 +15,10 @@ import { Line } from 'vue-chartjs'
 
 ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Filler, annotationPlugin)
 
-// Axis tick spacing for each range: a display choice, so it lives here rather than in the API
 const STEPS: Record<SummaryRange, number> = { '1w': 10, '1m': 25, '3m': 100, '6m': 200, '1y': 300 }
 const RANGE_KEYS = Object.keys(STEPS) as SummaryRange[]
-const Y_AXIS_WIDTH = 44 // fixed so the HTML date row below lines up with the plot
+const Y_AXIS_WIDTH = 44
 
-// Canvas can't read CSS variables, so these mirror the theme tokens in tailwind.css
 const COLORS = {
   info: '#22C5E8',
   danger: '#E63757',
@@ -34,13 +32,13 @@ const COLORS = {
 const FONT = '"Plus Jakarta Sans", system-ui, sans-serif'
 
 const range = ref<SummaryRange>('1w')
-const { data: summary, status } = useFlightHoursSummary(range)
+const { data: summary, status, refresh } = useFlightHoursSummary(range)
+const failed = computed(() => status.value === 'error')
 const loading = computed(() => status.value === 'pending')
 
 const DAYS = computed(() => summary.value?.points.length ?? 15)
 const TODAY_POS = computed(() => Math.max(0, summary.value?.points.findIndex(p => p.date === summary.value!.date) ?? 7))
 
-// The day whose tooltip is shown; null until the pilot hovers, taps or focuses one
 const active = ref<number | null>(null)
 const chartRef = ref<{ chart?: ChartJS<'line'> }>()
 
@@ -89,6 +87,7 @@ const chartData = computed<ChartData<'line'>>(() => ({
   labels: points.value.map(p => monthDay(p.date)),
   datasets: [{
     data: values.value,
+    clip: false,
     borderColor: COLORS.info,
     borderWidth: 2.5,
     borderJoinStyle: 'round',
@@ -158,7 +157,7 @@ const chartOptions = computed<ChartOptions<'line'>>(() => {
     responsive: true,
     maintainAspectRatio: false,
     animation: { duration: 300 },
-    layout: { padding: { top: 6 } },
+    layout: { padding: { top: 12 } },
     interaction: { mode: 'index', intersect: false },
     onHover: (_event, elements) => {
       const index = elements[0]?.index
@@ -282,8 +281,8 @@ const tooltip = computed(() => {
             <p class="text-sm font-medium text-text-secondary">Rolling {{ summary.windowDays }}-day total as of today</p>
           </template>
           <template v-else>
-            <span class="block h-9 w-24 rounded-md bg-background animate-pulse" />
-            <span class="block h-4 w-44 mt-0.5 rounded-md bg-background animate-pulse" />
+            <span class="block h-9 w-24 rounded-md bg-neutral-50" :class="{ 'animate-pulse': !failed }" />
+            <span class="block h-4 w-44 mt-0.5 rounded-md bg-neutral-50" :class="{ 'animate-pulse': !failed }" />
           </template>
         </div>
         <ui-badge v-if="summary" :color="summary.todayBadge.color" variant="icon" class="text-sm!">{{ summary.todayBadge.label }}</ui-badge>
@@ -304,9 +303,30 @@ const tooltip = computed(() => {
       </div>
     </div>
 
-    <p v-if="status === 'error' && !summary" class="text-text-secondary font-medium">Couldn't load your flight hours trend.</p>
-    <div v-else-if="!summary" class="h-[251px] rounded-xl bg-background animate-pulse" aria-label="Loading flight hours trend" />
-    <div v-else class="flex flex-col gap-2.5 transition-opacity" :class="{ 'opacity-50': loading }" :aria-busy="loading">
+    <div v-if="!summary" class="relative">
+      <div
+        class="h-[251px] rounded-xl bg-neutral-50"
+        :class="{ 'animate-pulse': !failed }"
+        :aria-label="failed ? undefined : 'Loading flight hours trend'"
+        :aria-hidden="failed || undefined"
+      />
+      <ui-error-state
+        v-if="failed"
+        class="absolute inset-0 rounded-xl bg-white/85 backdrop-blur-[2px]"
+        title="Couldn't load your flight hours trend"
+        description="Your rolling totals aren't available right now. Check your connection and try again."
+        @retry="refresh()"
+      />
+    </div>
+    <div v-else class="relative flex flex-col gap-2.5 transition-opacity" :class="{ 'opacity-50': loading }" :aria-busy="loading">
+      <!-- A range that fails to load: the chart underneath still shows the previous range -->
+      <ui-error-state
+        v-if="failed"
+        class="absolute inset-0 rounded-xl bg-white/85 backdrop-blur-[2px] z-20"
+        :title="`Couldn't load the ${range} range`"
+        description="The chart still shows the last range that loaded. Check your connection and try again."
+        @retry="refresh()"
+      />
       <div class="relative h-[206px]" @mouseleave="active = null">
         <ClientOnly>
           <Line

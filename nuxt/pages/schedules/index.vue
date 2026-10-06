@@ -15,17 +15,13 @@ import {
 import type { ScheduleDay } from '~/composables/useSchedules'
 import UiButton from '~/components/ui/button/index.vue'
 
-// The app's (simulated) today, from TODAY in .env
 const today = parseDate(useToday())
 
-// The month on screen; Reka moves it with the prev/next buttons and keyboard paging
-const placeholder = ref<DateValue>(today)
+const placeholder = shallowRef<DateValue>(today)
 
-// Lazy: navigation doesn't wait for the request, the page shows its loading state instead
 const { data: schedule, status } = useMonthSchedule(placeholder)
 const loading = computed(() => status.value === 'pending')
 
-// While the next month loads, don't paint the previous month's duties onto it
 const entries = computed<Record<number, ScheduleDay>>(() =>
   schedule.value?.year === placeholder.value.year && schedule.value?.month === placeholder.value.month
     ? Object.fromEntries(schedule.value.days.map(day => [Number(day.date.slice(8)), day]))
@@ -42,7 +38,6 @@ const isFutureMonth = computed(() => placeholder.value.compare(today) > 0 && !is
 
 const dutyLabels = computed(() => Object.fromEntries(legend.value.map(type => [type.code, type.label])))
 
-// Readable label colour on any duty colour the API sends
 function inkOn(hex: string) {
   const n = parseInt(hex.slice(1), 16)
   const [r, g, b] = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => {
@@ -191,8 +186,12 @@ function openDate(date: DateValue | DateValue[] | undefined) {
       <p class="font-bold text-lg">Duty types</p>
       <ui-card class="flex flex-col gap-4">
         <ul class="grid grid-cols-2 gap-x-4 gap-y-3">
-          <li v-for="type in legend" :key="type.code" class="flex items-start gap-1.5 text-[13px]">
-            <span class="size-3.5 shrink-0 rounded-sm" :style="{ backgroundColor: type.color }" />
+          <li v-if="status !== 'success'" v-for="(_, index) in [... new Array(10)]" :key="index" class="flex items-center gap-1.5 h-5">
+            <span class="size-3.5 shrink-0 rounded-sm bg-neutral-50 animate-pulse" />
+            <span class="h-3.5 w-8/12 shrink-0 rounded-sm bg-neutral-50 animate-pulse" />
+          </li>
+          <li v-else v-for="type in legend" :key="type.code" class="flex items-start gap-1.5 text-[13px] h-5">
+            <span class="size-3.5 shrink-0 rounded-sm mt-0.5" :style="{ backgroundColor: type.color }" />
             <span class="font-extrabold">{{ type.code }}</span>
             <span class="font-medium text-text-secondary">{{ type.label }}</span>
           </li>

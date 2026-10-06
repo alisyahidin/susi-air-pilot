@@ -43,7 +43,7 @@ const initials = computed(() =>
           class="flex items-center justify-center size-11 -mr-1.5 rounded-full cursor-pointer outline-none transition-colors hover:bg-background data-[state=open]:bg-background focus-visible:outline-2 focus-visible:outline-primary"
         >
           <ui-avatar>
-            <ui-avatar-image :src="user.image_url" :alt="user.name" />
+            <ui-avatar-image :src="user.imageUrl" :alt="user.name" />
             <ui-avatar-fallback>{{ initials }}</ui-avatar-fallback>
           </ui-avatar>
         </DropdownMenuTrigger>

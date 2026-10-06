@@ -2,6 +2,12 @@ import { Controller, Get, Inject, Query, SerializeOptions } from '@nestjs/common
 import { CurrentUser } from '@nestjs/authentication';
 import type { User } from '../users/entities/user.entity.js';
 import {
+  type FlightHoursQueryDto,
+  type FlightHoursResponseDto,
+  flightHoursQuerySchema,
+  flightHoursResponseSchema,
+} from './dto/flight-hours.dto.js';
+import {
   type HoursToLimitQueryDto,
   type HoursToLimitResponseDto,
   hoursToLimitQuerySchema,
@@ -22,6 +28,16 @@ export class FlightHoursController {
     private readonly flightHours: FlightHoursService,
     @Inject(TODAY) private readonly today: Today,
   ) {}
+
+  /** The signed-in pilot's hours for each day between `from` and `to` (both optional and inclusive). */
+  @Get()
+  @SerializeOptions({ schema: flightHoursResponseSchema })
+  getAll(
+    @CurrentUser() user: User,
+    @Query({ schema: flightHoursQuerySchema }) query: FlightHoursQueryDto,
+  ): Promise<FlightHoursResponseDto> {
+    return this.flightHours.getAll(user.id, query.from, query.to);
+  }
 
   @Get('limits')
   @SerializeOptions({ schema: hoursToLimitResponseSchema })

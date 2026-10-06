@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import type { HoursToLimitResponseDto, LimitStatus } from './dto/hours-to-limit.dto.js';
 import type { FlightHoursSummaryResponseDto, SummaryRange } from './dto/summary.dto.js';
 import { FlightHoursRepository } from './flight-hours.repository.js';
+import type { FlightHoursResponseDto } from './dto/flight-hours.dto.js';
 
 const PERIODS = [
   { period: 'daily', windowDays: 1 },
@@ -17,6 +18,10 @@ const DAY_MS = 86_400_000;
 @Injectable()
 export class FlightHoursService {
   constructor(private readonly flightHours: FlightHoursRepository) {}
+
+  async getAll(userId: string, from?: string, to?: string): Promise<FlightHoursResponseDto> {
+    return this.flightHours.entriesBetween(userId, from, to);
+  }
 
   async hoursToLimit(userId: string, date: string): Promise<HoursToLimitResponseDto> {
     const limits = await this.flightHours.limits();

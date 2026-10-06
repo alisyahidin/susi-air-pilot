@@ -29,10 +29,6 @@ const STATUSES = {
 
 const formatHours = (hours: number) => hours.toLocaleString('id-ID', { minimumFractionDigits: 1, maximumFractionDigits: 1 })
 
-/**
- * The signed-in pilot's daily, weekly, monthly and annual hours against their limits,
- * for the simulated today (useToday). Loads in the browser only, like every signed-in request.
- */
 export function useHoursToLimit() {
   const { $api } = useNuxtApp()
   const today = useToday()
@@ -71,11 +67,6 @@ export interface FlightHoursSummary {
   points: { date: string, hours: number, status: LimitStatus, projected: boolean }[]
 }
 
-/**
- * Rolling totals for `range` on the days around the simulated today (useToday), for the trend
- * chart. Refetches when `range` changes; the previous range's data stays until the new one
- * arrives, so the chart doesn't blank out. Loads in the browser only.
- */
 export function useFlightHoursSummary(range: Ref<SummaryRange>) {
   const { $api } = useNuxtApp()
   const today = useToday()

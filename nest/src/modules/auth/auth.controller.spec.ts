@@ -61,7 +61,7 @@ describe('AuthController', () => {
         id: '67b0ec9a-1786-46b9-9ee1-531297fb9e41',
         name: 'John Doe',
         username: 'johndoe',
-        image_url: 'https://i.pravatar.cc/120?u=johndoe',
+        imageUrl: 'https://i.pravatar.cc/120?u=johndoe',
       });
       expect(body).not.toHaveProperty('refreshToken');
 
