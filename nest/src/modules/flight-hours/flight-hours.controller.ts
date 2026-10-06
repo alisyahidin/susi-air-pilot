@@ -1,4 +1,5 @@
 import { Controller, Get, Inject, Query, SerializeOptions } from '@nestjs/common';
+import { ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
 import { CurrentUser } from '@nestjs/authentication';
 import type { User } from '../users/entities/user.entity.js';
 import {
@@ -22,6 +23,7 @@ import {
 import { TODAY, type Today } from '../../common/today.js';
 import { FlightHoursService } from './flight-hours.service.js';
 
+@ApiBearerAuth()
 @Controller('flight-hours')
 export class FlightHoursController {
   constructor(
@@ -32,6 +34,7 @@ export class FlightHoursController {
   /** The signed-in pilot's hours for each day between `from` and `to` (both optional and inclusive). */
   @Get()
   @SerializeOptions({ schema: flightHoursResponseSchema })
+  @ApiOkResponse({ standardSchema: flightHoursResponseSchema, isArray: true })
   getAll(
     @CurrentUser() user: User,
     @Query({ schema: flightHoursQuerySchema }) query: FlightHoursQueryDto,
@@ -41,6 +44,7 @@ export class FlightHoursController {
 
   @Get('limits')
   @SerializeOptions({ schema: hoursToLimitResponseSchema })
+  @ApiOkResponse({ standardSchema: hoursToLimitResponseSchema })
   hoursToLimit(
     @CurrentUser() user: User,
     @Query({ schema: hoursToLimitQuerySchema }) query: HoursToLimitQueryDto,
@@ -50,6 +54,7 @@ export class FlightHoursController {
 
   @Get('summary')
   @SerializeOptions({ schema: flightHoursSummaryResponseSchema })
+  @ApiOkResponse({ standardSchema: flightHoursSummaryResponseSchema })
   summary(
     @CurrentUser() user: User,
     @Query({ schema: flightHoursSummaryQuerySchema }) query: FlightHoursSummaryQueryDto,

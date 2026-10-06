@@ -1,4 +1,5 @@
 import { Controller, Get, Inject, Query, SerializeOptions } from '@nestjs/common';
+import { ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
 import { CurrentUser } from '@nestjs/authentication';
 import type { User } from '../users/entities/user.entity.js';
 import { TODAY, type Today } from '../../common/today.js';
@@ -10,6 +11,7 @@ import {
 } from './dto/schedules.dto.js';
 import { SchedulesService } from './schedules.service.js';
 
+@ApiBearerAuth()
 @Controller('schedules')
 export class SchedulesController {
   constructor(
@@ -19,6 +21,7 @@ export class SchedulesController {
 
   @Get()
   @SerializeOptions({ schema: schedulesResponseSchema })
+  @ApiOkResponse({ standardSchema: schedulesResponseSchema })
   monthFor(
     @CurrentUser() user: User,
     @Query({ schema: schedulesQuerySchema }) query: SchedulesQueryDto,

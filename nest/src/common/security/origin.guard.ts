@@ -11,7 +11,8 @@ const UNSAFE_METHODS = new Set(['POST', 'PUT', 'PATCH', 'DELETE']);
  * POST/PUT/PATCH/DELETE requests, else `Referer`. For those methods, a request that names
  * an origin must name one in CORS_ORIGIN, otherwise it's refused with 403 before any
  * handler runs. Requests with neither header don't come from a page in a browser (curl,
- * Bruno, server-to-server), so a forged request can't use them, and they pass.
+ * Bruno, server-to-server), so a forged request can't use them, and they pass. Same-origin
+ * requests (the API's own Swagger UI at /docs) pass too.
  */
 @Injectable()
 export class OriginGuard implements CanActivate {
@@ -30,6 +31,7 @@ export class OriginGuard implements CanActivate {
     const origin = request.headers.origin ?? originOf(request.headers.referer);
     if (origin === undefined) return true;
     if (this.allowedOrigins.has(origin)) return true;
+    if (hostOf(origin) === request.headers.host) return true;
 
     throw new ForbiddenException('Cross-origin request refused');
   }
@@ -41,5 +43,13 @@ function originOf(url: string | undefined): string | undefined {
     return new URL(url).origin;
   } catch {
     return 'invalid';
+  }
+}
+
+function hostOf(origin: string): string | undefined {
+  try {
+    return new URL(origin).host;
+  } catch {
+    return undefined;
   }
 }
