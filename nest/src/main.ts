@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { AppModule } from './app.module.js';
 import { appConfig, type AppConfig } from './config/index.js';
+import { setupSwagger } from './common/swagger/index.js';
 import fastifyCookie from '@fastify/cookie';
 import { VersioningType } from '@nestjs/common';
 
@@ -25,6 +26,8 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization'],
     maxAge: 600,
   });
+
+  setupSwagger(app);
 
   const { port } = app.get<AppConfig>(appConfig.KEY);
   await app.listen(port, '0.0.0.0');

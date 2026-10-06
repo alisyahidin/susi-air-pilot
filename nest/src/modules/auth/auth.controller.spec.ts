@@ -169,6 +169,12 @@ describe('AuthController', () => {
       // The refused refresh didn't spend the token
       expect((await post('refresh', { cookie, origin: NUXT_ORIGIN })).statusCode).toBe(200);
     });
+
+    it("allows the API's own origin, for Swagger UI at /docs", async () => {
+      const sameOrigin = { host: 'susi-air-pilot.fly.dev', origin: 'https://susi-air-pilot.fly.dev' };
+      expect((await login({ username: 'johndoe', password: 'susiairtest' }, sameOrigin)).statusCode).toBe(200);
+      expect((await login({ username: 'johndoe', password: 'susiairtest' }, { ...sameOrigin, host: 'other.example' })).statusCode).toBe(403);
+    });
   });
 
   describe('CORS', () => {

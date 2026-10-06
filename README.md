@@ -6,6 +6,7 @@ A small piece of the Susi Air Pilot App, built for the Fullstack Developer techn
 | ------------ | ------------------------------------- |
 | Frontend     | https://susi-air-ali.vercel.app       |
 | API          | https://susi-air-pilot.fly.dev/api/v1 |
+| API docs     | https://susi-air-pilot.fly.dev/docs   |
 | Test account | `johndoe` / `susiairtest`             |
 
 ## Repository layout
@@ -78,6 +79,7 @@ Two more protections go with the cookie: it is `SameSite=Strict` and scoped to `
 - **A config module** that validates environment variables with zod at startup.
 - **A mock database module** that loads the JSON files into memory. Only repositories read it, so replacing it with a real database would not touch services or controllers.
 - **zod for validation and serialization.** Each route declares a schema for its input and its output. Validation errors come back keyed by field, so the sign-in form can show each message under its input.
+- **OpenAPI docs** at `/docs` (Swagger UI; the JSON is at `/docs-json`), generated from the same zod schemas. The API's home page redirects there. Sign in with `POST /api/v1/auth/login`, then press Authorize and paste the `accessToken`.
 
 ### A configurable "today"
 
@@ -147,6 +149,7 @@ The legend under the calendar is rendered from the API's legend, and tapping a d
 - Added a loading indicator to the Schedule page.
 - Refactored for reuse and added error states.
 - Added `GET /flight-hours?from=&to=`.
+- Added OpenAPI docs with Swagger at `/docs`.
 
 ## Known limitations
 
@@ -177,7 +180,6 @@ The legend under the calendar is rendered from the API's legend, and tapping a d
 
 - Implement proper logging.
 - Improve auth session storage.
-- Add OpenAPI docs using swagger.
 - Add more testing coverage.
 
 ### Others

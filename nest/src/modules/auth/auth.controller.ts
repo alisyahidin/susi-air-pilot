@@ -1,4 +1,5 @@
 import { Body, Controller, HttpCode, HttpStatus, Inject, Post, Req, Res, SerializeOptions } from '@nestjs/common';
+import { ApiNoContentResponse, ApiOkResponse } from '@nestjs/swagger';
 import { AuthenticationError, Public } from '@nestjs/authentication';
 import type { FastifyReply, FastifyRequest } from 'fastify';
 import { appConfig, authConfig, type AppConfig, type AuthConfig } from '../../config/index.js';
@@ -25,6 +26,7 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @SerializeOptions({ schema: sessionResponseSchema })
+  @ApiOkResponse({ standardSchema: sessionResponseSchema })
   async login(
     @Body({ schema: loginSchema }) body: LoginDto,
     @Res({ passthrough: true }) reply: FastifyReply,
@@ -36,6 +38,7 @@ export class AuthController {
   @Post('refresh')
   @HttpCode(HttpStatus.OK)
   @SerializeOptions({ schema: sessionResponseSchema })
+  @ApiOkResponse({ standardSchema: sessionResponseSchema })
   async refresh(
     @Req() request: FastifyRequest,
     @Res({ passthrough: true }) reply: FastifyReply,
@@ -53,6 +56,7 @@ export class AuthController {
   }
 
   @Post('logout')
+  @ApiNoContentResponse()
   @HttpCode(HttpStatus.NO_CONTENT)
   async logout(@Req() request: FastifyRequest, @Res({ passthrough: true }) reply: FastifyReply): Promise<void> {
     const refreshToken = request.cookies[REFRESH_TOKEN_COOKIE];
