@@ -159,8 +159,9 @@ The legend under the calendar is rendered from the API's legend, and tapping a d
 
 ### Frontend
 
-- Implement the desktop view.
 - Make the app a PWA.
+- Add more testing coverage.
+- Implement the desktop view.
 
 **Desktop view preview.** Mockups of the planned layout at 1440 px. The data in them is illustrative; in the app every value comes from the API.
 
@@ -176,7 +177,8 @@ The legend under the calendar is rendered from the API's legend, and tapping a d
 
 - Implement proper logging.
 - Improve auth session storage.
-- Add OpenAPI docs using swagger
+- Add OpenAPI docs using swagger.
+- Add more testing coverage.
 
 ### Others
 
