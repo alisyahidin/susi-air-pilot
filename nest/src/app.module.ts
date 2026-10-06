@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
-import { APP_GUARD } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { ConfigModule } from '@nestjs/config';
 import { AuthenticationModule } from '@nestjs/authentication';
+import { AllExceptionsFilter } from './common/filters/index.js';
 import { OriginGuard } from './common/security/index.js';
 import { validationProviders } from './common/validation/index.js';
 import { appConfig, authConfig, envSchema, type AuthConfig } from './config/index.js';
@@ -43,6 +44,8 @@ import { UsersModule } from './modules/users/users.module.js';
     ...validationProviders,
     // CSRF: refuses POST/PUT/PATCH/DELETE from browser origins outside CORS_ORIGIN
     { provide: APP_GUARD, useClass: OriginGuard },
+    // One error body for every response; 500s are logged and their details hidden
+    { provide: APP_FILTER, useClass: AllExceptionsFilter },
   ],
 })
 export class AppModule {}
